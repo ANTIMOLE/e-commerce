@@ -1,0 +1,156 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background:         var(--background);
+  --color-foreground:         var(--foreground);
+  --font-sans:                var(--font-geist-sans);
+  --font-mono:                var(--font-geist-mono);
+  --color-ring:               var(--ring);
+  --color-input:              var(--input);
+  --color-border:             var(--border);
+  --color-destructive:        var(--destructive);
+  --color-accent-foreground:  var(--accent-foreground);
+  --color-accent:             var(--accent);
+  --color-muted-foreground:   var(--muted-foreground);
+  --color-muted:              var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary:          var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary:            var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover:            var(--popover);
+  --color-card-foreground:    var(--card-foreground);
+  --color-card:               var(--card);
+  --radius-sm:  calc(var(--radius) - 4px);
+  --radius-md:  calc(var(--radius) - 2px);
+  --radius-lg:  var(--radius);
+  --radius-xl:  calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+
+  /* Zenit brand colors — bisa dipakai langsung: bg-zenit-primary, text-zenit-teal */
+  --color-zenit-primary: #6C63FF;
+  --color-zenit-teal:    #3ECFCF;
+  --color-zenit-dark:    #0F0F1A;
+}
+
+/* ── LIGHT MODE ─────────────────────────────────────────────── */
+:root {
+  --radius: 0.625rem;
+
+  --background:         oklch(1 0 0);
+  --foreground:         oklch(0.13 0.02 285);
+
+  --card:               oklch(1 0 0);
+  --card-foreground:    oklch(0.13 0.02 285);
+
+  --popover:            oklch(1 0 0);
+  --popover-foreground: oklch(0.13 0.02 285);
+
+  /* Primary = Zenit violet #6C63FF */
+  --primary:            oklch(0.55 0.22 270);
+  --primary-foreground: oklch(1 0 0);
+
+  /* Secondary = light violet tint */
+  --secondary:          oklch(0.95 0.03 270);
+  --secondary-foreground: oklch(0.55 0.22 270);
+
+  /* Muted = neutral gray */
+  --muted:              oklch(0.96 0.005 286);
+  --muted-foreground:   oklch(0.55 0.015 286);
+
+  /* Accent = Zenit teal #3ECFCF */
+  --accent:             oklch(0.94 0.06 192);
+  --accent-foreground:  oklch(0.35 0.10 192);
+
+  --destructive:        oklch(0.58 0.24 27);
+
+  --border:             oklch(0.91 0.008 270);
+  --input:              oklch(0.91 0.008 270);
+  --ring:               oklch(0.55 0.22 270);
+}
+
+/* ── DARK MODE ──────────────────────────────────────────────── */
+.dark {
+  /* Dark bg = Zenit #0F0F1A */
+  --background:         oklch(0.11 0.02 285);
+  --foreground:         oklch(0.97 0 0);
+
+  --card:               oklch(0.15 0.02 285);
+  --card-foreground:    oklch(0.97 0 0);
+
+  --popover:            oklch(0.15 0.02 285);
+  --popover-foreground: oklch(0.97 0 0);
+
+  /* Primary = brighter violet in dark */
+  --primary:            oklch(0.65 0.22 270);
+  --primary-foreground: oklch(0.11 0.02 285);
+
+  --secondary:          oklch(0.20 0.03 285);
+  --secondary-foreground: oklch(0.97 0 0);
+
+  --muted:              oklch(0.20 0.03 285);
+  --muted-foreground:   oklch(0.65 0.015 285);
+
+  /* Accent = teal slightly brighter */
+  --accent:             oklch(0.22 0.05 192);
+  --accent-foreground:  oklch(0.77 0.12 192);
+
+  --destructive:        oklch(0.70 0.19 22);
+
+  --border:             oklch(1 0 0 / 10%);
+  --input:              oklch(1 0 0 / 15%);
+  --ring:               oklch(0.65 0.22 270);
+}
+
+/* ── BASE ───────────────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  /* Typography scale */
+  h1 { @apply text-4xl font-bold tracking-tight; }
+  h2 { @apply text-3xl font-semibold tracking-tight; }
+  h3 { @apply text-2xl font-semibold; }
+  h4 { @apply text-xl font-semibold; }
+}
+
+/* ── UTILITIES ──────────────────────────────────────────────── */
+@layer utilities {
+  /* Gradient text — pakai di heading hero */
+  .text-gradient {
+    background: linear-gradient(135deg, #6C63FF 0%, #3ECFCF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Gradient background — tombol, banner */
+  .bg-gradient-zenit {
+    background: linear-gradient(135deg, #6C63FF 0%, #3ECFCF 100%);
+  }
+
+  /* Card hover effect */
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
+  }
+
+  /* Price text */
+  .text-price {
+    @apply font-bold text-primary;
+  }
+
+  /* Badge sold */
+  .badge-sold {
+    @apply text-xs text-muted-foreground;
+  }
+}

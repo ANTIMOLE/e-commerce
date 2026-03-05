@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
+  <defs>
+    <linearGradient id="zGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6C63FF"/>
+      <stop offset="100%" stop-color="#3ECFCF"/>
+    </linearGradient>
+    <linearGradient id="markGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6C63FF"/>
+      <stop offset="100%" stop-color="#3ECFCF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Z mark — geometric angular shape -->
+  <g transform="translate(0, 6)">
+    <!-- Z lettermark, bold geometric -->
+    <polygon points="4,2 28,2 28,8 14,40 28,40 28,46 4,46 4,40 18,8 4,8" fill="url(#markGrad)"/>
+    <!-- Small accent dot -->
+    <circle cx="32" cy="6" r="3" fill="#3ECFCF" opacity="0.7"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text
+    x="48"
+    y="42"
+    font-family="'Helvetica Neue', 'Arial', sans-serif"
+    font-size="30"
+    font-weight="700"
+    letter-spacing="-1"
+    fill="url(#zGrad)"
+  >ZENIT</text>
+
+  <!-- Tagline -->
+  <text
+    x="49"
+    y="54"
+    font-family="'Helvetica Neue', 'Arial', sans-serif"
+    font-size="8"
+    font-weight="400"
+    letter-spacing="3"
+    fill="#9CA3AF"
+  >MARKETPLACE</text>
+</svg>

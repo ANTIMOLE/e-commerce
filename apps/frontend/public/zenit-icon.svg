@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6C63FF"/>
+      <stop offset="100%" stop-color="#3ECFCF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="48" height="48" rx="12" fill="url(#bg)"/>
+
+  <!-- Z lettermark white -->
+  <polygon
+    points="8,8 40,8 40,16 22,32 40,32 40,40 8,40 8,32 26,16 8,16"
+    fill="white"
+  />
+</svg>
