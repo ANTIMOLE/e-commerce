@@ -38,7 +38,7 @@ export default function LoginPage() {
   function onSubmit(data: LoginForm) {
     if (!captchaDone) return;
     // captchaToken dikirim ke backend untuk verifikasi server-side
-    login({ ...data, captchaToken });
+    login({ ...data, ...(captchaToken && { captchaToken }) });
   }
 
   return (
@@ -50,7 +50,7 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold text-gray-900">Masuk ke Zenit</h1>
           <p className="text-gray-500 text-sm mt-1">
             Belum punya akun?{" "}
-            <Link href="/register" className="text-primary font-medium hover:underline">
+            <Link href="/register" className="text-primary font-medium hover:underline ">
               Daftar gratis
             </Link>
           </p>

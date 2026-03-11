@@ -52,7 +52,7 @@ export function Navbar() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 value={search}
-                onChange={e => setSearch(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
                 placeholder="Cari produk di Zenit..."
                 className="pl-10 pr-4 h-10 bg-gray-50 border-gray-200 focus:border-primary focus:bg-white"
               />

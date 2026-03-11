@@ -12,8 +12,9 @@ export const registerSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email:    z.string().email("Format email tidak valid"),
-  password: z.string().min(1, "Password tidak boleh kosong"),
+  email:        z.string().email("Format email tidak valid"),
+  password:     z.string().min(1, "Password tidak boleh kosong"),
+  captchaToken: z.string().optional(),
 });
 
 export const refreshTokenSchema = z.object({

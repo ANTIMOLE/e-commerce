@@ -4,13 +4,13 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
-    "build":      "rimraf dist && tsc",
-    "dev":        "tsc --watch",
-    "db:generate":"prisma generate",
+    "build": "rimraf dist && tsc",
+    "dev": "tsc --watch",
+    "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:seed":    "ts-node --project tsconfig.json prisma/seed.ts",
-    "db:reset":   "prisma migrate reset --force",
-    "db:studio":  "prisma studio"
+    "db:seed": "ts-node --project tsconfig.json prisma/seed.ts",
+    "db:reset": "prisma migrate reset --force",
+    "db:studio": "prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^7.4.1",
@@ -23,6 +23,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.3.2",
     "prisma": "^7.4.1",
+    "prisma-dbml-generator": "^0.12.0",
     "rimraf": "^6.1.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"

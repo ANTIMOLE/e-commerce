@@ -32,9 +32,11 @@ export interface AuthTokens {
 }
 
 export interface LoginInput {
-  email:    string;
-  password: string;
+  email:        string;
+  password:     string;
+  captchaToken?: string;
 }
+
 
 export interface RegisterInput {
   name:     string;

@@ -41,13 +41,13 @@ export default function HomePage() {
               Jutaan produk pilihan dari ribuan penjual terpercaya di seluruh Indonesia.
             </p>
             <div className="flex flex-wrap gap-3 justify-center md:justify-start">
-              <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold" asChild>
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold hover" asChild>
                 <Link href={ROUTES.PRODUCTS}>
                   Mulai Belanja
                   <ShoppingBag className="ml-2 w-4 h-4" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10" asChild>
+              <Button size="lg" variant="outline" className="border-white text-black hover:bg-white/10 hover:text-white" asChild>
                 <Link href={ROUTES.REGISTER}>Daftar Gratis</Link>
               </Button>
             </div>
