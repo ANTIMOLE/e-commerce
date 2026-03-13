@@ -7,6 +7,7 @@ import { ProductCard, ProductCardSkeleton } from "@/components/shared/ProductCar
 import { useBestsellers } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
 import { ROUTES } from "@/lib/constants";
+import { Input } from "@/components/ui/input";
 
 // ── Category icon map ─────────────────────────────────────────
 const CATEGORY_ICONS: Record<string, string> = {
@@ -83,6 +84,15 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Search  ───────────────────────────────── */}
+      <section>
+        <div className="flex-wrap mx-30 mt-5">
+          <div className="relative">
+            <Input placeholder="Cari produk..." className="bg-white border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:bg-gray-100" />
+          </div>
+        </div>
+      </section>
+      
       {/* ── Kategori Populer ───────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 py-8 w-full">
         <div className="flex items-center justify-between mb-5">
@@ -165,7 +175,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 py-12 text-center">
           <h2 className="text-2xl font-bold mb-2">Bergabung dengan Zenit Sekarang</h2>
           <p className="text-gray-400 mb-6">Daftar gratis dan nikmati pengalaman belanja terbaik</p>
-          <Button size="lg" className="bg-gradient-zenit border-0" asChild>
+          <Button size="lg" className="bg-linear-to-r
+    from-purple-300 to-blue-400
+    hover:from-amber-300 hover:to-purple-300
+    border-0" asChild>
             <Link href={ROUTES.REGISTER}>Daftar Sekarang — Gratis!</Link>
           </Button>
         </div>
