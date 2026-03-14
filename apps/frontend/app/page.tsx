@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, ShoppingBag, Zap, Shield, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductCard, ProductCardSkeleton } from "@/components/shared/ProductCard";
@@ -56,7 +57,13 @@ export default function HomePage() {
           {/* Ilustrasi sederhana */}
           <div className="flex-shrink-0 text-center hidden md:block">
             <div className="w-64 h-64 bg-white/10 rounded-full flex items-center justify-center text-8xl">
-              🛍️
+              <Image
+                src="/zenit-icon.svg"
+                alt="ZENIT SHOPPING"
+                width={256}
+                height={256}
+                priority
+              />
             </div>
           </div>
         </div>

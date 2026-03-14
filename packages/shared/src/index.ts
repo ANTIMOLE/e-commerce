@@ -17,6 +17,7 @@ export * from "./utils/hash";
 export * from "./utils/jwt";
 export * from "./utils/pagination";
 export * from "./utils/response";
+export { prisma } from "./database";
 
 // Prisma client
 // export { prisma } from "./database";

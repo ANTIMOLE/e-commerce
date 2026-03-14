@@ -1,48 +1,33 @@
 // ============================================================
 // api.ts
-// HTTP client setup untuk REST API dan tRPC client
+// HTTP client setup — pakai httpOnly cookie, bukan localStorage
 // ============================================================
 
-import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
-import { API_BASE_URL, ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "./constants";
+import axios, { type AxiosError } from "axios";
+import { API_BASE_URL } from "./constants";
 
-// ── Axios Instance (REST) ─────────────────────────────────────
+// ── Axios Instance ────────────────────────────────────────────
 export const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL:         API_BASE_URL,
+  withCredentials: true, // kirim cookie di setiap request otomatis
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10_000, // 10 detik
+  timeout: 10_000,
 });
-
-// ── Request Interceptor ───────────────────────────────────────
-// Otomatis attach JWT ke setiap request kalau ada token
-api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token =
-      typeof window !== "undefined"
-        ? localStorage.getItem(ACCESS_TOKEN_KEY)
-        : null;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
 
 // ── Response Interceptor ──────────────────────────────────────
 // Auto-refresh token kalau dapat 401
 let isRefreshing = false;
 let failedQueue: {
-  resolve: (token: string) => void;
-  reject: (err: unknown) => void;
+  resolve: (value?: unknown) => void;
+  reject:  (err: unknown) => void;
 }[] = [];
 
-function processQueue(error: unknown, token: string | null) {
+function processQueue(error: unknown) {
   failedQueue.forEach((prom) => {
     if (error) prom.reject(error);
-    else prom.resolve(token!);
+    else       prom.resolve();
   });
   failedQueue = [];
 }
@@ -50,46 +35,29 @@ function processQueue(error: unknown, token: string | null) {
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config as typeof error.config & { _retry?: boolean };
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest?._retry) {
       if (isRefreshing) {
-        // Queue request yang masuk saat sedang refresh
+        // Queue request lain yang masuk saat sedang refresh
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return api(originalRequest);
-        });
+        }).then(() => api(originalRequest!));
       }
 
-      originalRequest._retry = true;
+      originalRequest!._retry = true;
       isRefreshing = true;
 
       try {
-        const refreshToken =
-          typeof window !== "undefined"
-            ? localStorage.getItem(REFRESH_TOKEN_KEY)
-            : null;
+        // Hit endpoint refresh — cookie refreshToken dikirim otomatis
+        await api.post("/auth/refresh");
 
-        if (!refreshToken) throw new Error("No refresh token");
-
-        const { data } = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-          refreshToken,
-        });
-
-        const newToken: string = data.data.accessToken;
-        localStorage.setItem(ACCESS_TOKEN_KEY, newToken);
-
-        processQueue(null, newToken);
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
-        return api(originalRequest);
+        processQueue(null);
+        return api(originalRequest!);
       } catch (refreshError) {
-        processQueue(refreshError, null);
-        // Token expired total — force logout
+        processQueue(refreshError);
+        // Redirect ke login kalau refresh juga gagal
         if (typeof window !== "undefined") {
-          localStorage.removeItem(ACCESS_TOKEN_KEY);
-          localStorage.removeItem(REFRESH_TOKEN_KEY);
           window.location.href = "/login";
         }
         return Promise.reject(refreshError);
@@ -103,13 +71,12 @@ api.interceptors.response.use(
 );
 
 // ── Error Helper ──────────────────────────────────────────────
-// Extract pesan error yang bisa ditampilkan ke user
 export function getErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
     return (
       error.response?.data?.message ??
-      error.response?.data?.error ??
-      error.message ??
+      error.response?.data?.error   ??
+      error.message                 ??
       "Terjadi kesalahan. Silakan coba lagi."
     );
   }

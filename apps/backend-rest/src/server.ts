@@ -1,7 +1,8 @@
-import "./config/env"; // validate env first
+import "./config/env";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import cookieParser from "cookie-parser";
 import { env } from "./config/env";
 import { router } from "./routes";
 import { errorMiddleware } from "./middlewares/error.middleware";
@@ -13,6 +14,7 @@ app.use(helmet());
 app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // ── Health Check ──────────────────────────────────────────────
 app.get("/health", (_req, res) => {

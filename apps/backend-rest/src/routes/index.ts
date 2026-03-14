@@ -1,6 +1,6 @@
 import { Router, IRouter } from "express";
-import { authRoutes }     from "./auth.routes";
-import { productRoutes }  from "./product.routes";
+import { authRouter }     from "./auth.routes";
+import { productRouter }  from "./product.routes";
 import { categoryRoutes } from "./category.routes";
 import { cartRoutes }     from "./cart.routes";
 import { checkoutRoutes } from "./checkout.routes";
@@ -9,8 +9,8 @@ import { profileRoutes }  from "./profile.routes";
 
 export const router: IRouter = Router();
 
-router.use("/auth",       authRoutes);
-router.use("/products",   productRoutes);
+router.use("/auth",       authRouter);
+router.use("/products",   productRouter);
 router.use("/categories", categoryRoutes);
 router.use("/cart",       cartRoutes);
 router.use("/checkout",   checkoutRoutes);
