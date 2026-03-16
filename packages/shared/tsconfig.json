@@ -14,8 +14,9 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "types": ["node"]   // ← tambah ini
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "prisma/**/*"],   // ← tambah prisma/**/*
   "exclude": ["node_modules", "dist", "generated"]
 }

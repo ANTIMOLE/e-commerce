@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import type { AuthRequest } from "../middlewares/auth.middleware";
 import * as authService from "../services/auth.service";
-import { env } from "src/config/env";
+import { env } from "../config/env";
 
 const COOKIE_OPTIONS = {
   httpOnly: true,

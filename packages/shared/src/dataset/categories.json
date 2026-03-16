@@ -1,0 +1,1528 @@
+[
+  {
+    "id": "82ca4f05-ac7f-4ae6-9b97-29a5cf69ef6e",
+    "name": "Aksesoris Kamera Baterai Charger",
+    "slug": "aksesoris-kamera-baterai-charger",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "176e78f7-301d-4691-b5be-dd135479a4b9",
+    "name": "Aksesoris Kamera Case",
+    "slug": "aksesoris-kamera-case",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "702605e9-2230-4dfd-b096-dff3fd4a93b6",
+    "name": "Aksesoris Kamera Cleaning",
+    "slug": "aksesoris-kamera-cleaning",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "5c501faf-dc0d-4326-a0c1-88196bbd5f58",
+    "name": "Aksesoris Kamera Dry Box",
+    "slug": "aksesoris-kamera-dry-box",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "8934adea-3e5b-47df-882c-66677204ae5f",
+    "name": "Aksesoris Kamera Microphone",
+    "slug": "aksesoris-kamera-microphone",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "9e83c3f3-144f-4a42-bdea-c58239745879",
+    "name": "Aksesoris Kamera Stabilizer",
+    "slug": "aksesoris-kamera-stabilizer",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "3b6cf799-fc16-415d-8bf1-c12a8c4929c7",
+    "name": "Aksesoris Kamera Strap",
+    "slug": "aksesoris-kamera-strap",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "5dfee03c-632a-4a79-83ea-ff3495e0253f",
+    "name": "Aksesoris Kamera Tas",
+    "slug": "aksesoris-kamera-tas",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "ae9ef84a-67cb-4d62-85e3-b8ca664f3b3f",
+    "name": "Aksesoris Kamera Tripod",
+    "slug": "aksesoris-kamera-tripod",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "06f96b5e-12ad-4dad-bab6-e2cf071afded",
+    "name": "Al Quran",
+    "slug": "al-quran",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "9b1dd72a-dbbb-4bce-bd1b-9b0d55f1a279",
+    "name": "Alkitab",
+    "slug": "alkitab",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "8aaf135e-9aab-49f4-ac83-3a99d131ae55",
+    "name": "Audio Amplifier",
+    "slug": "audio-amplifier",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "c966772c-49f3-496f-b1b8-0759d953d105",
+    "name": "Audio Earphone",
+    "slug": "audio-earphone",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "fd84fcd9-340c-4b5a-b12d-381c791ae1dd",
+    "name": "Audio Headphone",
+    "slug": "audio-headphone",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "8748805b-0ade-4b38-984f-843563d385b4",
+    "name": "Audio Speaker",
+    "slug": "audio-speaker",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "2df0d2a4-ef45-43a8-bf4e-4b59b6caab26",
+    "name": "Audio Tws",
+    "slug": "audio-tws",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "90a6803a-f16c-4c50-a9d6-43933c022018",
+    "name": "Audio Voice Recorder",
+    "slug": "audio-voice-recorder",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "8dbf5e97-717f-42c2-8718-25649d4f3bcb",
+    "name": "Buku Agama Islam",
+    "slug": "buku-agama-islam",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "c7d803bf-3cdc-4b14-96b0-dc8f0318fc47",
+    "name": "Buku Aktivitas",
+    "slug": "buku-aktivitas",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "27b1173f-0c17-4462-9980-6444354d89c2",
+    "name": "Buku Biografi",
+    "slug": "buku-biografi",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "437ecb6a-57b5-4b8f-a1e6-083b414e3d59",
+    "name": "Buku Bisnis",
+    "slug": "buku-bisnis",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "62e38cf5-3a5d-47d7-8c2f-c3aa32bae6a1",
+    "name": "Buku Cerita Anak",
+    "slug": "buku-cerita-anak",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "af3037db-1dfd-4f7a-8675-1b230553b7b4",
+    "name": "Buku Database",
+    "slug": "buku-database",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "cd541c23-18f4-464e-89f7-3ccbe06fb981",
+    "name": "Buku Design Graphics",
+    "slug": "buku-design-graphics",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "64123ab9-d28e-4550-8e8b-375569d1be68",
+    "name": "Buku Diet",
+    "slug": "buku-diet",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "2ff6bc21-4bae-4ec7-b5a1-8ee087a3c91f",
+    "name": "Buku Dongeng",
+    "slug": "buku-dongeng",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "2a78e91f-600e-438e-9184-3ec35eb4f36a",
+    "name": "Buku Ekonomi",
+    "slug": "buku-ekonomi",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "5d7f5b3b-5a71-484f-b6a4-6ffcc41d1695",
+    "name": "Buku Ensiklopedia",
+    "slug": "buku-ensiklopedia",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "d2bebfc6-7b9c-4301-bd9a-f695895d0585",
+    "name": "Buku Fotografi",
+    "slug": "buku-fotografi",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "a847aab0-a4f7-4585-bac7-cb29491ceef5",
+    "name": "Buku Kesehatan Anak",
+    "slug": "buku-kesehatan-anak",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "de2f1a7f-6860-41c8-88d8-eedafc35ba9a",
+    "name": "Buku Kesuksesan",
+    "slug": "buku-kesuksesan",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "75494ee5-bbc3-4255-aaa0-e0f55d49367e",
+    "name": "Buku Latihan Kebugaran",
+    "slug": "buku-latihan-kebugaran",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "b4b73896-8706-41d2-b5bc-f43c1dcba077",
+    "name": "Buku Leadership",
+    "slug": "buku-leadership",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "97b1ff02-34d7-462a-a13d-70da50e4a656",
+    "name": "Buku Manajemen",
+    "slug": "buku-manajemen",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "294d0b4e-f3d6-4660-a793-df61fef08d03",
+    "name": "Buku Mewarnai",
+    "slug": "buku-mewarnai",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "551ed101-70db-4d39-8130-1557a2ab8a46",
+    "name": "Buku Programming",
+    "slug": "buku-programming",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "eb89d2f8-68f5-465f-9070-5883ac1db2f0",
+    "name": "Buku Resep Kue",
+    "slug": "buku-resep-kue",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "64a760ac-ebaa-45aa-939f-283822cc4c25",
+    "name": "Buku Resep Masakan",
+    "slug": "buku-resep-masakan",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "56920547-30ac-4d9f-9f08-a14188da172c",
+    "name": "Buku Resep Minuman",
+    "slug": "buku-resep-minuman",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "d0fdcdf7-bb7f-4a36-8b2d-6a210869264e",
+    "name": "Buku Sd Kelas 1",
+    "slug": "buku-sd-kelas-1",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "e03c53c4-6c00-4d0c-8fc6-405fb8470e11",
+    "name": "Buku Sd Kelas 4",
+    "slug": "buku-sd-kelas-4",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "b8b00d9d-203d-4d71-8a15-632ad46f931f",
+    "name": "Buku Sejarah",
+    "slug": "buku-sejarah",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "ce1db8e3-1239-4869-bb6f-f2902402cf45",
+    "name": "Buku Self Improvement",
+    "slug": "buku-self-improvement",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "c918cc23-6860-4c56-8183-4bf8ee7e34a4",
+    "name": "Buku Sma Kelas 1",
+    "slug": "buku-sma-kelas-1",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "0b544ba4-3a68-4c3d-addf-31346648e41f",
+    "name": "Buku Sma Kelas 2",
+    "slug": "buku-sma-kelas-2",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "712cf146-bea6-4b27-b865-1888a8a3d5ed",
+    "name": "Buku Smp Kelas 1",
+    "slug": "buku-smp-kelas-1",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "3cefaf7d-b45e-4d88-a0b8-150bfe7fd6c5",
+    "name": "Dapur Botol Minum",
+    "slug": "dapur-botol-minum",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "4b05cc3b-1ee9-41b2-955c-d364690aa0d7",
+    "name": "Dapur Cetakan Kue",
+    "slug": "dapur-cetakan-kue",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "5deb4c38-458c-4132-82c0-4c134543c0b3",
+    "name": "Dapur Coffee Maker",
+    "slug": "dapur-coffee-maker",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "803cdef2-dedc-4301-8d75-adc5a2d5637f",
+    "name": "Dapur Deep Fryer",
+    "slug": "dapur-deep-fryer",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "3a6915a1-0d06-4693-a123-1144581095a7",
+    "name": "Dapur Gelas Mug",
+    "slug": "dapur-gelas-mug",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "fe0cd6e9-47de-4fd9-bd75-31be19fc8bb6",
+    "name": "Dapur Gunting",
+    "slug": "dapur-gunting",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "651c55de-09f3-4669-8a38-8c6a230e875e",
+    "name": "Dapur Kompor",
+    "slug": "dapur-kompor",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "ca6b2522-d72e-4b2e-a3d1-eb5756b84cf0",
+    "name": "Dapur Kotak Makan",
+    "slug": "dapur-kotak-makan",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "518e137e-397a-4b4e-87fd-2b4dff08d79a",
+    "name": "Dapur Loyang",
+    "slug": "dapur-loyang",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "6c738131-17d9-4aaf-bb35-89e78c21afc6",
+    "name": "Dapur Mangkok",
+    "slug": "dapur-mangkok",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "805022aa-7d64-44f9-a2b8-afe375e03cea",
+    "name": "Dapur Panci",
+    "slug": "dapur-panci",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "e4020739-ca58-4b7e-a964-7a910e921200",
+    "name": "Dapur Parutan",
+    "slug": "dapur-parutan",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "bfaef920-c61f-49be-938a-8035f52216b6",
+    "name": "Dapur Peeler",
+    "slug": "dapur-peeler",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "be074154-3229-401c-94cc-24b0536ebbf8",
+    "name": "Dapur Piring",
+    "slug": "dapur-piring",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "2867fed1-78ee-4494-884d-33d9183baf9b",
+    "name": "Dapur Pisau",
+    "slug": "dapur-pisau",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "a292e5e4-e474-4a0e-bdd7-fa03d641c8bd",
+    "name": "Dapur Rak",
+    "slug": "dapur-rak",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "549e0d2d-1e2f-4d5c-a47e-f58e9a551ab4",
+    "name": "Dapur Sendok Garpu",
+    "slug": "dapur-sendok-garpu",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "56b6f216-e5a5-4f00-b7e1-758f8caa33d9",
+    "name": "Dapur Spatula",
+    "slug": "dapur-spatula",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "7f251f95-706e-4d5a-b1d2-621a14962ae9",
+    "name": "Dapur Talenan",
+    "slug": "dapur-talenan",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "61d6ffdd-05ad-4355-938a-20106439c02a",
+    "name": "Dapur Termos",
+    "slug": "dapur-termos",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "ab4bd6ed-31a3-48c7-92af-22ca1c790971",
+    "name": "Dapur Toples",
+    "slug": "dapur-toples",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "d0864324-931d-4bb8-a7cf-26ee9a76c1b9",
+    "name": "Dapur Wajan",
+    "slug": "dapur-wajan",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "4f0184c1-9b0d-48b3-b619-03b263b0e0da",
+    "name": "Drone Kamera",
+    "slug": "drone-kamera",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "5e05a3e9-04ce-4ecd-b7a2-7cd3386ea056",
+    "name": "Elektronik Ac",
+    "slug": "elektronik-ac",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "e2bf87ea-47ec-437b-8fb0-2d855bc84fbb",
+    "name": "Elektronik Ac Portable",
+    "slug": "elektronik-ac-portable",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "36c7ba8c-cdd2-4b82-be7c-f36dcd83caae",
+    "name": "Elektronik Air Cooler",
+    "slug": "elektronik-air-cooler",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "23c788a6-9344-4ba0-8874-94dadbc3b745",
+    "name": "Elektronik Air Fryer",
+    "slug": "elektronik-air-fryer",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "6b8d0b74-04da-4196-b2f6-007d56362b1a",
+    "name": "Elektronik Air Purifier",
+    "slug": "elektronik-air-purifier",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "e0eaa328-3b91-4ed8-bab4-5770fd56963c",
+    "name": "Elektronik Blender",
+    "slug": "elektronik-blender",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "c67a0bfa-5fc3-4dc3-85e6-db3202dbb7e9",
+    "name": "Elektronik Dispenser",
+    "slug": "elektronik-dispenser",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "c9328f17-4626-44da-892e-2e84e09c8cf7",
+    "name": "Elektronik Juicer",
+    "slug": "elektronik-juicer",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "03d13336-bc31-44dd-adc2-71afc62be346",
+    "name": "Elektronik Kipas",
+    "slug": "elektronik-kipas",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "18f02e1b-444c-4c33-813b-34e75dd1a52e",
+    "name": "Elektronik Kulkas",
+    "slug": "elektronik-kulkas",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "628d909e-a215-41e9-bdaa-853b1621989f",
+    "name": "Elektronik Mesin Cuci",
+    "slug": "elektronik-mesin-cuci",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "39421f8d-c9df-414f-95f5-8d9169c8c204",
+    "name": "Elektronik Microwave",
+    "slug": "elektronik-microwave",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "e628b632-d2cc-4237-b0b7-0d35f213c508",
+    "name": "Elektronik Mixer",
+    "slug": "elektronik-mixer",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "0204fe44-cac3-458a-b34a-cbede1f7c19a",
+    "name": "Elektronik Oven",
+    "slug": "elektronik-oven",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "0119680a-4644-4c19-bb07-5de5c0e3bb98",
+    "name": "Elektronik Rice Cooker",
+    "slug": "elektronik-rice-cooker",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "5e4d8ec1-b7f6-4ba2-b56c-d996a9cf7ed9",
+    "name": "Elektronik Teko",
+    "slug": "elektronik-teko",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "750cd138-a5f9-4cfb-9cfd-02a0f8487605",
+    "name": "Elektronik Toaster",
+    "slug": "elektronik-toaster",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "0ef149f6-ef26-4d10-ba19-c49120c4b063",
+    "name": "Fashion Anak Laki Baju Tidur",
+    "slug": "fashion-anak-laki-baju-tidur",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "cf242568-36ab-4570-9024-914504baa29e",
+    "name": "Fashion Anak Laki Celana Panjang",
+    "slug": "fashion-anak-laki-celana-panjang",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "4149bb82-4efe-41d7-9ac8-363a6134300b",
+    "name": "Fashion Anak Laki Celana Pendek",
+    "slug": "fashion-anak-laki-celana-pendek",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "9ef5b8a0-607c-4308-b77d-c5991e249771",
+    "name": "Fashion Anak Laki Hoodie",
+    "slug": "fashion-anak-laki-hoodie",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "faaaf6ff-aa5a-4a82-8e84-dbab7baec884",
+    "name": "Fashion Anak Laki Jaket",
+    "slug": "fashion-anak-laki-jaket",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "e1de592d-a00e-4f4b-818d-9eda6bd37703",
+    "name": "Fashion Anak Laki Sepatu Sandal",
+    "slug": "fashion-anak-laki-sepatu-sandal",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "60c1c939-0598-4c6e-9389-320f2c434184",
+    "name": "Fashion Anak Laki Sepatu Sneakers",
+    "slug": "fashion-anak-laki-sepatu-sneakers",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "4edc5b95-1830-4b1a-ae96-606296ac19d4",
+    "name": "Fashion Anak Laki Setelan",
+    "slug": "fashion-anak-laki-setelan",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "0ab7b08e-5406-4d16-a8aa-ea330576e91e",
+    "name": "Fashion Anak Perempuan Blouse",
+    "slug": "fashion-anak-perempuan-blouse",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "11e2f937-17d2-446d-a1b1-28cbbc5da135",
+    "name": "Fashion Anak Perempuan Dress",
+    "slug": "fashion-anak-perempuan-dress",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "ad14d8ea-5822-4b6d-9e67-c54a0b3a1a0b",
+    "name": "Fashion Anak Perempuan Rok",
+    "slug": "fashion-anak-perempuan-rok",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "3871779f-9455-4652-b38f-1bbc2d698329",
+    "name": "Fashion Anak Perempuan Sandal",
+    "slug": "fashion-anak-perempuan-sandal",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "a00ca366-f8ad-405c-911d-622eae395cad",
+    "name": "Fashion Anak Perempuan Setelan",
+    "slug": "fashion-anak-perempuan-setelan",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "4573760f-6dfb-41ca-b809-a7b272668589",
+    "name": "Fashion Anak Perempuan Sneakers",
+    "slug": "fashion-anak-perempuan-sneakers",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "e28455e4-e377-4a3d-b484-068a2115ad06",
+    "name": "Fashion Anak Tas Ransel",
+    "slug": "fashion-anak-tas-ransel",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "e737d597-4a10-42eb-b776-8771512518ad",
+    "name": "Fashion Bayi Jumper",
+    "slug": "fashion-bayi-jumper",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "bda29ecf-5991-4370-97a8-51b9107b6d64",
+    "name": "Fashion Bayi Pakaian Laki",
+    "slug": "fashion-bayi-pakaian-laki",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "9a97378c-8f1b-4531-b781-a5d936d1d13f",
+    "name": "Fashion Muslim Abaya",
+    "slug": "fashion-muslim-abaya",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "c604d493-ab3e-4a6c-86db-9501eac870e7",
+    "name": "Fashion Muslim Baju Koko",
+    "slug": "fashion-muslim-baju-koko",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "cb0a963b-036b-4ecd-bff4-f4d9596b519e",
+    "name": "Fashion Muslim Celana",
+    "slug": "fashion-muslim-celana",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "2ffa805a-d8ec-4522-92e3-d31d1922d7a5",
+    "name": "Fashion Muslim Gamis",
+    "slug": "fashion-muslim-gamis",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "328a7c2d-657f-43cd-84dd-b73b424aaa74",
+    "name": "Fashion Muslim Hijab Instan",
+    "slug": "fashion-muslim-hijab-instan",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "55e11b0f-c70f-4483-acb9-dd4d747ca687",
+    "name": "Fashion Muslim Hijab Segi Empat",
+    "slug": "fashion-muslim-hijab-segi-empat",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "17ab30e9-334e-4164-a8c9-5129bf1b6ca8",
+    "name": "Fashion Muslim Kaftan",
+    "slug": "fashion-muslim-kaftan",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "d0559c04-0f8c-4120-97b5-545d1c71fc47",
+    "name": "Fashion Muslim Mukena",
+    "slug": "fashion-muslim-mukena",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "62e71601-536a-4862-bf7f-f73025965bd2",
+    "name": "Fashion Muslim Pashmina",
+    "slug": "fashion-muslim-pashmina",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "7d86a92a-351b-4128-b0f5-b2a174686e9a",
+    "name": "Fashion Muslim Rok",
+    "slug": "fashion-muslim-rok",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "d7138d6c-6858-403b-8f97-75e391e01562",
+    "name": "Fashion Muslim Sajadah",
+    "slug": "fashion-muslim-sajadah",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "96e45fc4-7684-4a62-be93-b6b92c26962e",
+    "name": "Fashion Muslim Sarung",
+    "slug": "fashion-muslim-sarung",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "fcf6ef80-2b9a-4d68-9ae2-22d3021482ed",
+    "name": "Fashion Muslim Tunik",
+    "slug": "fashion-muslim-tunik",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "bf55068f-8725-4f67-ad66-6329b2347bca",
+    "name": "Fashion Pria Batik Kemeja",
+    "slug": "fashion-pria-batik-kemeja",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "0530a865-2ec5-40b1-8535-b6b203e0a721",
+    "name": "Fashion Pria Blazer",
+    "slug": "fashion-pria-blazer",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "c841522f-12d3-47c5-ad07-acd72f2e0daa",
+    "name": "Fashion Pria Boots",
+    "slug": "fashion-pria-boots",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "e7fb002f-a78c-4b5e-968c-16d62f44f8de",
+    "name": "Fashion Pria Cardigan",
+    "slug": "fashion-pria-cardigan",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "c92e2647-e3e2-41a8-b3b4-91d5f35a709c",
+    "name": "Fashion Pria Celana Cargo",
+    "slug": "fashion-pria-celana-cargo",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "cd9e3875-255e-4194-805a-5b5135a5a6ec",
+    "name": "Fashion Pria Celana Chino",
+    "slug": "fashion-pria-celana-chino",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "9019aa2e-4d64-461e-99f4-8146c94f00e1",
+    "name": "Fashion Pria Celana Dalam",
+    "slug": "fashion-pria-celana-dalam",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "397f7b90-4661-4cec-8ec6-4df5890282d4",
+    "name": "Fashion Pria Celana Jogger",
+    "slug": "fashion-pria-celana-jogger",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "89cc50b7-9a4a-4a91-b313-f38a5180301f",
+    "name": "Fashion Pria Celana Pendek",
+    "slug": "fashion-pria-celana-pendek",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "96d12007-c603-4e5d-9ff2-c034770e3da0",
+    "name": "Fashion Pria Dompet",
+    "slug": "fashion-pria-dompet",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "1080a9b3-b65a-4b91-b8d4-97a9bd8b063b",
+    "name": "Fashion Pria Hoodie",
+    "slug": "fashion-pria-hoodie",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "270062b9-2106-4b09-87af-417a8b9e67d1",
+    "name": "Fashion Pria Ikat Pinggang",
+    "slug": "fashion-pria-ikat-pinggang",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "f59b7689-5319-4a46-9746-48ca27310271",
+    "name": "Fashion Pria Jaket",
+    "slug": "fashion-pria-jaket",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "f3d60a33-425d-4b44-a5a4-87d37caec6b9",
+    "name": "Fashion Pria Jas",
+    "slug": "fashion-pria-jas",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "4c75fbc3-9a5f-4d8f-a00f-35979e556974",
+    "name": "Fashion Pria Jeans",
+    "slug": "fashion-pria-jeans",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "9c89fa58-b7ab-4752-9657-5f74eedc911e",
+    "name": "Fashion Pria Kaos",
+    "slug": "fashion-pria-kaos",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "350a0d11-6383-40fe-8de7-a6845cadaa5f",
+    "name": "Fashion Pria Kemeja",
+    "slug": "fashion-pria-kemeja",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "ceee647d-6c19-4db1-9228-fff9cc1fa7c6",
+    "name": "Fashion Pria Loafers",
+    "slug": "fashion-pria-loafers",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "ba61460e-fb78-4641-aec8-2148fec8f78e",
+    "name": "Fashion Pria Sandal",
+    "slug": "fashion-pria-sandal",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "b9c45806-dfbe-4048-bc22-5cc7c1d0304e",
+    "name": "Fashion Pria Sneakers",
+    "slug": "fashion-pria-sneakers",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "7f2ad647-673b-4e2b-916c-8a5e1d0a5a6c",
+    "name": "Fashion Pria Tas Ransel",
+    "slug": "fashion-pria-tas-ransel",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "f8b00622-b951-465d-bd9f-41ac8845ffef",
+    "name": "Fashion Pria Tas Selempang",
+    "slug": "fashion-pria-tas-selempang",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "f1f9376e-139d-4aa4-9f38-34cd93f6a791",
+    "name": "Fashion Pria Topi Baseball",
+    "slug": "fashion-pria-topi-baseball",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "49dfa8a7-8c7d-4fe3-bf94-d92bc07bafaa",
+    "name": "Fashion Seragam Atasan",
+    "slug": "fashion-seragam-atasan",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "16de01bb-385f-4111-b4d5-676b4bdf1f73",
+    "name": "Fashion Seragam Bawahan",
+    "slug": "fashion-seragam-bawahan",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "c4cae295-888a-4670-95b8-ab3aba527b6d",
+    "name": "Fashion Wanita Anting",
+    "slug": "fashion-wanita-anting",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "227cc017-918d-4e4c-8d8a-91835a796cc8",
+    "name": "Fashion Wanita Blazer",
+    "slug": "fashion-wanita-blazer",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "2b331808-5f7f-4e2b-8fd9-ed4e983543b8",
+    "name": "Fashion Wanita Blouse",
+    "slug": "fashion-wanita-blouse",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "f53f90ac-6ee5-4cd8-a2eb-92e0cdef55dc",
+    "name": "Fashion Wanita Boots",
+    "slug": "fashion-wanita-boots",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "339dd47b-865d-4554-83a5-48612226b3ad",
+    "name": "Fashion Wanita Bra",
+    "slug": "fashion-wanita-bra",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "6bc30547-ce10-4b0c-8197-900608c41e91",
+    "name": "Fashion Wanita Cardigan",
+    "slug": "fashion-wanita-cardigan",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "f48c116b-3674-434a-a64e-e27cf56800ad",
+    "name": "Fashion Wanita Celana Dalam",
+    "slug": "fashion-wanita-celana-dalam",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "b8c7af96-d7c0-4259-9506-64c2cf1b4701",
+    "name": "Fashion Wanita Celana Kulot",
+    "slug": "fashion-wanita-celana-kulot",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "929fb5e4-b1ef-452f-86d0-279b6063f575",
+    "name": "Fashion Wanita Celana Panjang",
+    "slug": "fashion-wanita-celana-panjang",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "28817368-3c9e-415b-af16-920279c3c619",
+    "name": "Fashion Wanita Celana Pendek",
+    "slug": "fashion-wanita-celana-pendek",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "30886ae3-7446-4559-8cf6-4a5362c5f315",
+    "name": "Fashion Wanita Crop Top",
+    "slug": "fashion-wanita-crop-top",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "73b9445c-1d7c-490e-9bf1-16f15559faab",
+    "name": "Fashion Wanita Dompet",
+    "slug": "fashion-wanita-dompet",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "63acffe4-2726-4716-9e53-1ec481a4a2fb",
+    "name": "Fashion Wanita Flat Shoes",
+    "slug": "fashion-wanita-flat-shoes",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "b39c3991-a32e-4a18-915a-18c1199aa0f7",
+    "name": "Fashion Wanita Gelang",
+    "slug": "fashion-wanita-gelang",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "2dd0f2ec-bffd-4cc3-a9a3-275362078be1",
+    "name": "Fashion Wanita Handbag",
+    "slug": "fashion-wanita-handbag",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "87192636-75d6-495b-b4db-b6ba9528649d",
+    "name": "Fashion Wanita Heels",
+    "slug": "fashion-wanita-heels",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "953b13db-cf72-4f22-b132-9e5d6182d0cc",
+    "name": "Fashion Wanita Hoodie",
+    "slug": "fashion-wanita-hoodie",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "e38f01cb-eb26-4ffb-86b1-b8a722221aa7",
+    "name": "Fashion Wanita Jeans",
+    "slug": "fashion-wanita-jeans",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "b5f31ffa-96cb-481e-9107-104f35f19b4c",
+    "name": "Fashion Wanita Kalung",
+    "slug": "fashion-wanita-kalung",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "cc143c3d-3a73-4550-a4a1-00f23755c3f1",
+    "name": "Fashion Wanita Kaos",
+    "slug": "fashion-wanita-kaos",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "357c16e7-4213-4e12-a824-fccab99b1be3",
+    "name": "Fashion Wanita Kebaya Brukat",
+    "slug": "fashion-wanita-kebaya-brukat",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "75465772-aad0-4d6c-b84a-bdbab81bb6ef",
+    "name": "Fashion Wanita Kemeja",
+    "slug": "fashion-wanita-kemeja",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "e4c2a801-0cf0-4888-803f-530d6a563f84",
+    "name": "Fashion Wanita Legging",
+    "slug": "fashion-wanita-legging",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "f28c0abf-04b6-4e90-82fe-60af0d0d30ee",
+    "name": "Fashion Wanita Maxi Dress",
+    "slug": "fashion-wanita-maxi-dress",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "fe2dc1eb-3f95-4426-bcf4-2445babb6c74",
+    "name": "Fashion Wanita Midi Dress",
+    "slug": "fashion-wanita-midi-dress",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "24e23cf1-6fc5-4fdd-b941-c16e900ae57e",
+    "name": "Fashion Wanita Mini Dress",
+    "slug": "fashion-wanita-mini-dress",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "52f0ceb3-2096-4bf2-bb42-1583104c2d57",
+    "name": "Fashion Wanita Rok",
+    "slug": "fashion-wanita-rok",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "6323b339-768e-4b18-a7f9-534187defa6d",
+    "name": "Fashion Wanita Sandal",
+    "slug": "fashion-wanita-sandal",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "0fa411f0-5701-4220-9bba-a9133bf65fa4",
+    "name": "Fashion Wanita Sneakers",
+    "slug": "fashion-wanita-sneakers",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "f916f135-1ea5-4ee2-a3c3-f1b3d31073bd",
+    "name": "Fashion Wanita Tank Top",
+    "slug": "fashion-wanita-tank-top",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "4e00a98a-1f6e-4045-a944-b94461af6dce",
+    "name": "Fashion Wanita Tas Ransel",
+    "slug": "fashion-wanita-tas-ransel",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "4cff28f4-5f5d-4509-b6fa-a13c60689d6f",
+    "name": "Fashion Wanita Tas Selempang",
+    "slug": "fashion-wanita-tas-selempang",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "dfafae1b-158f-4353-bd39-0aa63ecc1ff2",
+    "name": "Fashion Wanita Tote",
+    "slug": "fashion-wanita-tote",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "8acae7de-0756-4045-b52c-d8637b4e5f74",
+    "name": "Film Alat Musik Tradisional",
+    "slug": "film-alat-musik-tradisional",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "06513441-bd43-4a7f-ac78-f0799bd36c8a",
+    "name": "Film Bass Elektrik",
+    "slug": "film-bass-elektrik",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "b30cb21a-21a4-4977-8c55-85cbe9c56ac5",
+    "name": "Film Drum Elektrik",
+    "slug": "film-drum-elektrik",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "52b64d21-e227-49df-9b2c-8822945fb494",
+    "name": "Film Drum Pad",
+    "slug": "film-drum-pad",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "12ce2ada-de3b-40e6-8c8a-83a2785a55ac",
+    "name": "Film Gitar Akustik",
+    "slug": "film-gitar-akustik",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "2c22f799-c639-4483-b1fd-b88d7b9c5558",
+    "name": "Film Gitar Elektrik",
+    "slug": "film-gitar-elektrik",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "6be518cd-0fea-40c9-ab21-24f6763426e6",
+    "name": "Film Keyboard",
+    "slug": "film-keyboard",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "a7d27cb1-0d8a-484a-a964-943021eacbbb",
+    "name": "Film Piano Elektrik",
+    "slug": "film-piano-elektrik",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "b976ce51-0f73-4999-bec0-b965f6e0738f",
+    "name": "Film Ukulele",
+    "slug": "film-ukulele",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "6e694e97-3320-4e9c-9947-43fe6f95b3f2",
+    "name": "Gaming Aksesoris Casing",
+    "slug": "gaming-aksesoris-casing",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "3e4a0e0b-0d24-46aa-a734-daed5301e07a",
+    "name": "Gaming Aksesoris Joystick",
+    "slug": "gaming-aksesoris-joystick",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "d929dd46-ae4c-43d5-84ea-5b0035b4ed60",
+    "name": "Gaming Nintendo",
+    "slug": "gaming-nintendo",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "c5b53bdb-12af-4e31-8319-e1b5073d2f12",
+    "name": "Gaming Playstation",
+    "slug": "gaming-playstation",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "8cf5218d-5de3-4823-9f0c-36cb123b8da2",
+    "name": "Gaming Xbox",
+    "slug": "gaming-xbox",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "00e9db4d-25b9-405f-9c0f-6505bdd3201b",
+    "name": "Hp Aksesoris Charger",
+    "slug": "hp-aksesoris-charger",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "81eedd08-b8da-4ff8-b11c-f83ce969786a",
+    "name": "Hp Aksesoris Hardcase",
+    "slug": "hp-aksesoris-hardcase",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "fd7d2cbd-b103-4e01-88f5-2e6e7538663b",
+    "name": "Hp Aksesoris Holder",
+    "slug": "hp-aksesoris-holder",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "454ae43f-084a-4211-910e-489f368491c5",
+    "name": "Hp Aksesoris Kabel Data",
+    "slug": "hp-aksesoris-kabel-data",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "7a2d40de-13de-4ad6-a90f-30bebcb4e7e8",
+    "name": "Hp Aksesoris Screen Protector",
+    "slug": "hp-aksesoris-screen-protector",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "0eedde6d-9342-4d19-a156-aba90311a569",
+    "name": "Hp Aksesoris Softcase",
+    "slug": "hp-aksesoris-softcase",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "42cd3365-8c44-44e6-bb51-ce59cdf38dcd",
+    "name": "Hp Android",
+    "slug": "hp-android",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "ec659dc7-a47f-4fa9-a4a9-589c6d9d318e",
+    "name": "Hp Ios",
+    "slug": "hp-ios",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "249dec25-3d20-42f5-bd24-6ed37d44a9cc",
+    "name": "Hp Powerbank",
+    "slug": "hp-powerbank",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "299bfc29-f420-42cc-912c-f51a6f6ad160",
+    "name": "Kamera 360",
+    "slug": "kamera-360",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "ede7a472-31f8-48cb-912c-82ad1b097ac3",
+    "name": "Kamera Action Camera",
+    "slug": "kamera-action-camera",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "02c9c79b-8061-4005-b1f8-3cb4d2b72d9e",
+    "name": "Kamera Cctv",
+    "slug": "kamera-cctv",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "8ed77c55-bde5-4cef-916b-41286b7d8289",
+    "name": "Kamera Dslr",
+    "slug": "kamera-dslr",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "1918dbd8-a169-4937-b5be-cc52e1bd6481",
+    "name": "Kamera Instan Printer",
+    "slug": "kamera-instan-printer",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "818b3363-864a-4a91-bd1d-007bae3ba57f",
+    "name": "Kamera Ip",
+    "slug": "kamera-ip",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "03d4fb75-e854-4db2-8b5a-a98cbf6e5126",
+    "name": "Kamera Mirrorless",
+    "slug": "kamera-mirrorless",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "362a33a2-4f4a-40dd-a842-b91b3fdc09c3",
+    "name": "Kamera Pocket",
+    "slug": "kamera-pocket",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "3d3842a1-a8f2-4493-a5fb-00804f1e438b",
+    "name": "Kamera Spy",
+    "slug": "kamera-spy",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "f4606d5b-b182-4060-b0bd-e0e6e5086437",
+    "name": "Komik Anak",
+    "slug": "komik-anak",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "28399ed4-5210-436f-a375-78ab76dcfb60",
+    "name": "Komik Manga",
+    "slug": "komik-manga",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "7e158bc3-c11d-4c84-8bbf-62a111e02f27",
+    "name": "Lensa Kamera",
+    "slug": "lensa-kamera",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "223227cb-8194-4059-9aa3-894242100c18",
+    "name": "Lighting Flash Kamera",
+    "slug": "lighting-flash-kamera",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "cd72d67b-208b-4c1c-bb53-8c21c22bdd25",
+    "name": "Lighting Ring Light",
+    "slug": "lighting-ring-light",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "576aa6c6-b722-4a3b-b0cb-203f169c00d8",
+    "name": "Novel Fantasi",
+    "slug": "novel-fantasi",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "f6bf0e96-f402-432a-9815-b14030cef5f1",
+    "name": "Novel Indonesia",
+    "slug": "novel-indonesia",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "bd396873-8833-4e47-a1bc-970fc16ccda2",
+    "name": "Novel Misteri",
+    "slug": "novel-misteri",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "c82435c5-1783-49d9-bcb3-0b5a78ddccc0",
+    "name": "Novel Roman",
+    "slug": "novel-roman",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "2bfddfd8-3601-4ca0-8488-ef1e49f8524f",
+    "name": "Novel Terjemahan",
+    "slug": "novel-terjemahan",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "45aeeee8-bfbd-4106-a64e-66354cb97994",
+    "name": "Tablet Android",
+    "slug": "tablet-android",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  },
+  {
+    "id": "fe3e5fbc-17d0-49ed-9439-512e88f0022a",
+    "name": "Tablet Ios",
+    "slug": "tablet-ios",
+    "description": null,
+    "created_at": "2026-03-15T02:55:17.000Z"
+  }
+]
