@@ -1,9 +1,12 @@
 import { PrismaClient } from '../generated/prisma'
+import { PrismaPg } from '@prisma/adapter-pg'
+import 'dotenv/config'
 import fs from 'fs'
 import path from 'path'
 import { parse } from 'csv-parse/sync'
 
-const prisma = new PrismaClient()
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! })
+const prisma = new PrismaClient({ adapter })
 
 // ============================================================
 // HELPER: Parse images field dari CSV
@@ -29,7 +32,7 @@ function parseImages(raw: string): string[] {
 async function seedCategories() {
   console.log('🌱 Seeding categories...')
 
-  const filePath = path.join(__dirname, 'categories.json')
+  const filePath = path.join(__dirname, 'dataset/categories.json')
   const raw = fs.readFileSync(filePath, 'utf-8')
   const categories = JSON.parse(raw)
 
@@ -64,7 +67,7 @@ async function seedProducts() {
   }
 
   // Baca CSV
-  const filePath = path.join(__dirname, 'tokopedia_20000.csv')
+  const filePath = path.join(__dirname, 'dataset/tokopedia_20000.csv')
   const raw = fs.readFileSync(filePath, 'utf-8')
   const rows = parse(raw, {
     columns: true,

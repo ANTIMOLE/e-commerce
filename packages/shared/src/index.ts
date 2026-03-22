@@ -11,6 +11,8 @@ export * from "./validations/auth.schema";
 export * from "./validations/product.schema";
 export * from "./validations/cart.schema";
 export * from "./validations/checkout.schema";
+export * from "./validations/profile.schema";
+export * from "./validations/order.schema";
 
 // Utils
 export * from "./utils/hash";
