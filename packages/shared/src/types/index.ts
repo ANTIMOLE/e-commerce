@@ -33,6 +33,7 @@ export interface ProductQueryParams extends PaginationParams {
 export interface JwtPayload {
   userId: string;
   email:  string;
+  role:   "USER" | "ADMIN";  // ← added
   iat?:   number;
   exp?:   number;
 }
@@ -93,3 +94,26 @@ export const PAYMENT_OPTIONS: PaymentOption[] = [
 ];
 
 export const TAX_RATE = 0.11;
+
+// ── User ──────────────────────────────────────────────────────
+export interface User {
+  id:        string;
+  name:      string;
+  email:     string;
+  role:      "USER" | "ADMIN";
+  phone?:    string | null;
+  createdAt: string;
+}
+
+// ── Input Types ───────────────────────────────────────────────
+export interface LoginInput {
+  email:        string;
+  password:     string;
+  captchaToken?: string;
+}
+
+export interface RegisterInput {
+  name:     string;
+  email:    string;
+  password: string;
+}
