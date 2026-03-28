@@ -12,7 +12,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // url      = env("DATABASE_URL")
 }
 
 // ============================================================
@@ -65,11 +65,11 @@ model RefreshToken {
 // ============================================================
 
 model Category {
-  id          String    @id @default(uuid())
-  name        String    @unique @db.VarChar(100)
-  slug        String    @unique @db.VarChar(120)
-  description String?   @db.Text
-  createdAt   DateTime  @default(now()) @map("created_at")
+  id          String   @id @default(uuid())
+  name        String   @unique @db.VarChar(100)
+  slug        String   @unique @db.VarChar(120)
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
 
   // Relations
   products Product[]

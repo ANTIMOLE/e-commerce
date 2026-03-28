@@ -6,6 +6,7 @@ import * as trpcExpress from "@trpc/server/adapters/express";
 import { env } from "./config/env";
 import { appRouter } from "./routers";
 import { createContext } from "./trpc/context";
+import cookieParser from "cookie-parser";
 
 const app: import("express").Express = express();
 
@@ -18,10 +19,12 @@ app.use(express.json({ limit: "10mb" }));
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", api: "tRPC", timestamp: new Date().toISOString() });
 });
+app.use(cookieParser());
 
 // ── tRPC Handler ──────────────────────────────────────────────
 // createExpressMiddleware = adapter yang bertindak sebagai
 // "glue" antara Express dan tRPC router (trpc.io/docs/server/adapters)
+//
 app.use(
   "/trpc",
   trpcExpress.createExpressMiddleware({
