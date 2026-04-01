@@ -1,31 +1,13 @@
 "use client";
 
-import { useCallback }   from "react";
-import { useRouter }     from "next/navigation";
+import { useCallback }    from "react";
+import { useRouter }      from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { trpc }          from "@/lib/trpc";
-import { queryKeys }     from "@/lib/queryClient";Q
-import { ROUTES }        from "@/lib/constants";
-import { ACCESS_TOKEN_KEY } from "@/lib/constants";
-import { toast }         from "sonner";
+import { trpc }           from "@/lib/trpc";
+import { queryKeys }      from "@/lib/queryClient";
+import { ROUTES }         from "@/lib/constants";
+import { toast }          from "sonner";
 
-// ── helpers ───────────────────────────────────────────────────
-function saveToken(token: string) {
-  if (typeof window !== "undefined") {
-    localStorage.setItem(ACCESS_TOKEN_KEY, token);
-  }
-}
-function clearToken() {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
-  }
-}
-
-// ============================================================
-// useAuth (tRPC)
-// Mirrors hooks/rest/useAuth.ts interface exactly —
-// components stay the same, only transport layer changes.
-// ============================================================
 export function useAuth() {
   const router = useRouter();
   const qc     = useQueryClient();
@@ -37,9 +19,10 @@ export function useAuth() {
   });
 
   // ── Login ─────────────────────────────────────────────────
+  // Server sets accessToken + refreshToken as httpOnly cookies.
+  // No localStorage involved — browser sends cookies automatically.
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: (data) => {
-      saveToken(data.accessToken);
       qc.setQueryData(queryKeys.auth.me, data.user);
       toast.success(`Selamat datang, ${data.user.name}!`);
       const params = new URLSearchParams(window.location.search);
@@ -51,7 +34,6 @@ export function useAuth() {
   // ── Register ──────────────────────────────────────────────
   const registerMutation = trpc.auth.register.useMutation({
     onSuccess: (data) => {
-      saveToken(data.accessToken);
       qc.setQueryData(queryKeys.auth.me, data.user);
       toast.success("Akun berhasil dibuat!");
       router.push(ROUTES.HOME);
@@ -60,9 +42,9 @@ export function useAuth() {
   });
 
   // ── Logout ────────────────────────────────────────────────
+  // Server clears both cookies. QueryClient cache also cleared.
   const logoutMutation = trpc.auth.logout.useMutation({
     onSettled: () => {
-      clearToken();
       qc.clear();
       router.push(ROUTES.LOGIN);
     },

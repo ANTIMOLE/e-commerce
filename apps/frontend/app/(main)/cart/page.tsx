@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/hooks/useCart";
 import { formatPrice, getImageUrl } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
 import type { Cart } from "@/types";
@@ -39,19 +40,21 @@ export default function CartPage() {
   const { isAuthenticated, isLoading: loadingAuth } = useAuth();
 
   // TODO: ganti ini dengan: const { cart, isLoading, isEmpty, ... } = useCart();
-  const isLoading      = false;
+  // const isLoading      = false;
+  const { cart, isLoading, isEmpty, subtotal, tax, total,
+        updateItem, removeItem, clearCart, isMutating } = useCart();
 
-  const subtotal       = 0;
-  const tax            = 0;
-  const total          = 0;
+//   const subtotal       = 0;
+//   const tax            = 0;
+//   const total          = 0;
 
   const isUpdatingItem = false;
   const isRemovingItem = false;
-  const updateItem     = (_id: string, _qty: number) => {};
-  const removeItem     = (_id: string) => {};
+//   const updateItem     = (_id: string, _qty: number) => {};
+//   const removeItem     = (_id: string) => {};
 
-  const isEmpty        = true as boolean;       // hindari literal narrowing
-const cart           = null as unknown as Cart;
+//   const isEmpty        = true as boolean;       // hindari literal narrowing
+// const cart           = null as unknown as Cart;
 
   // ── Belum login ─────────────────────────────────────────────
   if (!loadingAuth && !isAuthenticated) {
@@ -158,7 +161,7 @@ const cart           = null as unknown as Cart;
                     <div className="flex items-center border rounded-lg overflow-hidden">
                       <button
                         disabled={isBusy || item.quantity <= 1}
-                        onClick={() => updateItem(item.id, item.quantity - 1)}
+                        onClick={() => updateItem({ cartItemId: item.id, quantity: item.quantity - 1 })}
                         className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       >
                         <Minus className="w-3.5 h-3.5" />
@@ -168,7 +171,7 @@ const cart           = null as unknown as Cart;
                       </span>
                       <button
                         disabled={isBusy || item.quantity >= item.product.stock}
-                        onClick={() => updateItem(item.id, item.quantity + 1)}
+                        onClick={() => updateItem({ cartItemId: item.id, quantity: item.quantity + 1 })}
                         className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                       >
                         <Plus className="w-3.5 h-3.5" />
@@ -187,7 +190,7 @@ const cart           = null as unknown as Cart;
                 {/* Subtotal per item */}
                 <div className="flex-shrink-0 text-right">
                   <p className="text-sm font-semibold text-gray-800">
-                    {formatPrice(item.priceAtTime * item.quantity)}
+                    {formatPrice(Number(item.priceAtTime) * item.quantity)}
                   </p>
                 </div>
               </div>

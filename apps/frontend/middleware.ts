@@ -18,7 +18,7 @@ export function middleware(req: NextRequest) {
 
   // Cek token dari cookie (untuk SSR)
   // Token juga disimpan di localStorage untuk client-side
-  const token = req.cookies.get("access_token")?.value;
+  const token = req.cookies.get("accessToken")?.value;
 
   const isProtected = PROTECTED_ROUTES.some((r) => pathname.startsWith(r));
   const isAuthRoute = AUTH_ROUTES.some((r) => pathname.startsWith(r));

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   User, Mail, Phone, Package, KeyRound,
@@ -24,12 +24,14 @@ export default function ProfilePage() {
   // TODO: sambungkan ke useProfile setelah hook diimplementasi
   // Untuk sekarang pakai data dari useAuth sebagai fallback
   const { profile, isLoading: loadingProfile, updateProfile, isUpdating } = useProfile();
+  const [form, setForm] = useState({ name: "", phone: "" });
 
   const [editMode, setEditMode] = useState(false);
-  const [form, setForm] = useState({
-    name:  user?.name  ?? "",
-    phone: user?.phone ?? "",
-  });
+  useEffect(() => {
+    if (profile) {
+      setForm({ name: profile.name ?? "", phone: profile.phone ?? "" });
+    }
+  }, [profile]);
 
   // Sync form saat data user datang
   const displayUser = profile ?? user;
@@ -219,3 +221,4 @@ export default function ProfilePage() {
     </div>
   );
 }
+

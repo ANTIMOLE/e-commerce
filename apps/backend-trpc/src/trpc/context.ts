@@ -62,18 +62,19 @@
 //
 
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
-import type { Response } from "express";
-import { verifyAccessToken, extractBearerToken } from "@ecommerce/shared";
+import type { Response }                    from "express";
+import { verifyAccessToken }                from "@ecommerce/shared";
 
 export interface Context {
   userId?:    string;
   userEmail?: string;
   userRole?:  "USER" | "ADMIN";
-  res:        Response; // Needed for set-cookie (refresh token)
+  res:        Response;
 }
 
 export function createContext({ req, res }: CreateExpressContextOptions): Context {
-  const token = extractBearerToken(req.headers.authorization);
+  // Read accessToken from httpOnly cookie — same as REST auth.middleware.ts
+  const token = req.cookies?.accessToken;
 
   if (!token) return { res };
 
@@ -86,6 +87,8 @@ export function createContext({ req, res }: CreateExpressContextOptions): Contex
       userRole:  payload.role,
     };
   } catch {
+    // Token invalid or expired — return empty context
+    // Protected procedures will throw UNAUTHORIZED
     return { res };
   }
 }

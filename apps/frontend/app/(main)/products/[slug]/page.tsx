@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -12,6 +12,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { useProductDetail } from "@/hooks/useProducts";
 import { formatPrice, formatSoldCount, getImageUrl } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
+import { useCart } from "@/hooks/useCart";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -20,6 +21,8 @@ interface Props {
 export default function ProductDetailPage({ params }: Props) {
   const { slug } = use(params);
   const router   = useRouter();
+  const { addItem, isAddingItem } = useCart();
+  const [quantity, setQuantity] = useState(1);
 
   const { data: product, isLoading, isError } = useProductDetail(slug);
 
@@ -186,13 +189,13 @@ export default function ProductDetailPage({ params }: Props) {
           {/* CTA Buttons */}
           {/* TODO: sambungkan ke useCart setelah hook siap */}
           <div className="flex gap-3 pt-2">
+
+
             <Button
-              variant="outline"
-              className="flex-1 gap-2 border-primary text-primary hover:bg-primary/5"
-              disabled={!isAvailable}
+              disabled={!isAvailable || isAddingItem}
+              onClick={() => addItem({ productId: product.id, quantity })}
             >
-              <ShoppingCart className="w-4 h-4" />
-              Tambah ke Keranjang
+              {isAddingItem ? "Menambahkan..." : "Tambah ke Keranjang"}
             </Button>
             <Button
               className="flex-1 gap-2 bg-gradient-zenit border-0"

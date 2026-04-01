@@ -7,13 +7,12 @@
 // Ini memastikan perbandingan REST vs tRPC apple-to-apple.
 // ============================================================
 
-import { createTRPCReact } from "@trpc/react-query";
-import { httpLink } from "@trpc/client";
-import type { AppRouter } from "../../backend-trpc/src/routers";
-import { TRPC_BASE_URL, ACCESS_TOKEN_KEY } from "./constants";
+import { createTRPCReact }  from "@trpc/react-query";
+import { httpLink }         from "@trpc/client";
+import type { AppRouter }   from "../../backend-trpc/src/routers";
+import { TRPC_BASE_URL }    from "./constants";
 
 // ── tRPC React Hook Factory ───────────────────────────────────
-// Dari ini semua hooks: trpc.product.list.useQuery(), dll
 export const trpc = createTRPCReact<AppRouter>();
 
 // ── tRPC Client ───────────────────────────────────────────────
@@ -23,21 +22,15 @@ export function createTRPCClient() {
       httpLink({
         url: TRPC_BASE_URL,
 
-        // Attach JWT ke setiap request
-        headers() {
-          const token =
-            typeof window !== "undefined"
-              ? localStorage.getItem(ACCESS_TOKEN_KEY)
-              : null;
-
-          return token
-            ? { Authorization: `Bearer ${token}` }
-            : {};
+        // Send cookies with every request (same as axios withCredentials: true)
+        // This is how accessToken cookie gets sent to tRPC server automatically
+        fetch(url, options) {
+          return fetch(url, { ...options, credentials: "include" });
         },
 
         // NOTE: httpLink — NO batching
-        // Setiap procedure call = 1 HTTP request terpisah
-        // Lihat: trpc.io/docs/client/links/httpLink
+        // Each procedure call = 1 HTTP request
+        // Ensures apple-to-apple comparison with REST
       }),
     ],
   });

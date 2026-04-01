@@ -10,10 +10,13 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
+
 import { formatPrice, getImageUrl } from "@/lib/utils";
 import { SHIPPING_OPTIONS, PAYMENT_METHODS, ROUTES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { ShippingMethodCode, PaymentMethodCode, Address, Cart } from "@/types";
+import { useCart } from "@/hooks/useCart";
+import { useAddresses, useCheckout } from "@/hooks/useCheckout";
 
 // ─────────────────────────────────────────────────────────────
 // HOOKS YANG DIBUTUHKAN:
@@ -45,15 +48,19 @@ export default function CheckoutPage() {
   const { isAuthenticated, isLoading: loadingAuth } = useAuth();
 
   // TODO: ganti dengan hooks asli
-const cart           = null as unknown as Cart;
-  const isLoadingCart          = false;
-  const isEmpty                = true;
-  const addresses: Address[]   = [];
-  const isLoadingAddr          = false;
-  const isConfirming           = false;
-  const subtotal               = 0;
-  const tax                    = 0;
-  const confirmCheckout        = async (_: any) => {};
+// const cart           = null as unknown as Cart;
+//   const isLoadingCart          = false;
+//   const isEmpty                = true;
+//   const addresses: Address[]   = [];
+//   const isLoadingAddr          = false;
+//   const isConfirming           = false;
+//   const subtotal               = 0;
+//   const tax                    = 0;
+//   const confirmCheckout        = async (_: any) => {};
+
+const { cart, isLoading: isLoadingCart, isEmpty, subtotal, tax } = useCart();
+const { data: addresses = [], isLoading: isLoadingAddr } = useAddresses();
+const { confirmCheckout, isConfirming } = useCheckout();
 
   // ── State pilihan user ──────────────────────────────────────
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
@@ -92,14 +99,13 @@ const cart           = null as unknown as Cart;
   async function handleConfirm() {
     if (!cart?.id || !selectedAddressId) return;
     try {
-      await confirmCheckout({
+      const order = await confirmCheckout({
         cartId:         cart.id,
         addressId:      selectedAddressId,
         shippingMethod: selectedShipping,
         paymentMethod:  selectedPayment,
       });
-      // TODO: ambil orderId dari response dan redirect
-      router.push(`/checkout/success?orderId=xxx`);
+      router.push(`/checkout/success?orderId=${order.id}&orderNumber=${order.orderNumber}`);
     } catch {
       // error sudah di-toast oleh hook
     }
