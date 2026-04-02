@@ -8,6 +8,7 @@ const PROTECTED_ROUTES = [
   "/checkout",
   "/orders",
   "/profile",
+  "/admin"
 ];
 
 // Route yang tidak boleh diakses kalau sudah login
