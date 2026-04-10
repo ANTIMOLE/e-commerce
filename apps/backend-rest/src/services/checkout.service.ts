@@ -18,7 +18,7 @@ export async function getCheckoutSummary(userId: string , orderNumber : string) 
             shippingAddress : true,
             shippingCost : true,
             paymentMethod : true,
-            shippingMethod : true,   
+            shippingMethod : true,
             user : {
                 select : {
                     name : true,
@@ -140,7 +140,7 @@ export async function confirmCheckout(userId: string, cartId: string, addressId:
         province: address?.province,
         zipCode: address?.zipCode,
     };
-        
+
 
     const productNames = await Promise.all(
         cart.items.map(item =>
@@ -216,7 +216,5 @@ export async function confirmCheckout(userId: string, cartId: string, addressId:
     }),
     ]);
 
-return order;
-    
     return order;
 }

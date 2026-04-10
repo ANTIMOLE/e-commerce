@@ -13,11 +13,10 @@ import {
 
 export const cartRoutes: IRouter = Router();
 
-//PROTECTED ROUTES - harus login dulu
+// PROTECTED ROUTES - harus login dulu
 
-cartRoutes.get("/", authenticate,validate(cartItemIdSchema), getCartController);
-cartRoutes.post("/", authenticate, validate(addCartItemSchema), addItemToCartController);
-cartRoutes.patch("/:itemId", authenticate, validate(updateCartItemSchema), updateCartItemController);
-cartRoutes.delete("/:itemId", authenticate, validate(cartItemIdSchema), removeCartItemController);
-cartRoutes.delete("/", authenticate, clearCartController);
-
+cartRoutes.get   ("/",         authenticate, getCartController);
+cartRoutes.post  ("/",         authenticate, validate(addCartItemSchema),    addItemToCartController);
+cartRoutes.patch ("/:itemId",  authenticate, validate(updateCartItemSchema), updateCartItemController);
+cartRoutes.delete("/",         authenticate, clearCartController);
+cartRoutes.delete("/:itemId",  authenticate, validate(cartItemIdSchema),     removeCartItemController);

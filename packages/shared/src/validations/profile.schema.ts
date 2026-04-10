@@ -36,7 +36,7 @@ import { z } from "zod";
 //     }
 
 //     const hashPassword = user.passwordHash;
-    
+
 
 //     const isMatch = await bcrypt.compare(currentPassword, hashPassword);
 //     if (!isMatch) {
@@ -68,7 +68,7 @@ import { z } from "zod";
 //     return prisma.address.create({
 //         data : {
 //             label : label || null,
-//             userId, 
+//             userId,
 //             recipientName ,
 //             phone,
 //             address,
@@ -83,11 +83,11 @@ import { z } from "zod";
 //     const address = await prisma.address.findUnique({
 //         where : { id : addressId }
 //     })
-//     if( !address || address.userId !== userId ) throw new AppError("Address not found", 404);   
+//     if( !address || address.userId !== userId ) throw new AppError("Address not found", 404);
 
 //     const { label, recipientName ,phone, address : addr, city , province , zipCode } = data;
 //     return prisma.address.update({
-//         where : { id : addressId }, 
+//         where : { id : addressId },
 //         data : {
 //             label : label || null,
 //             recipientName ,
@@ -134,13 +134,14 @@ export const updateProfileSchema = z.object({
 })
 
 export const addressSchema = z.object({
-    label : z.string().max(100).optional(),
+    label :         z.string().max(100).optional(),
     recipientName : z.string().min(2).max(100),
-    phone : z.string().min(9).max(20),
-    address : z.string().min(5),
-    city : z.string().min(2).max(100),
-    province : z.string().min(2).max(100),
-    zipCode : z.string().min(5).max(10),
+    phone :         z.string().min(9).max(20),
+    address :       z.string().min(5),
+    city :          z.string().min(2).max(100),
+    province :      z.string().min(2).max(100),
+    zipCode :       z.string().min(5).max(10),
+    isDefault :     z.boolean().optional(),
 })
 
 
@@ -148,5 +149,3 @@ export const addressSchema = z.object({
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type AddressInput = z.infer<typeof addressSchema>;
-
-

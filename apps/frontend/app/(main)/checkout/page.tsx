@@ -58,9 +58,9 @@ export default function CheckoutPage() {
 //   const tax                    = 0;
 //   const confirmCheckout        = async (_: any) => {};
 
-const { cart, isLoading: isLoadingCart, isEmpty, subtotal, tax } = useCart();
-const { data: addresses = [], isLoading: isLoadingAddr } = useAddresses();
-const { confirmCheckout, isConfirming } = useCheckout();
+  const { cart, isLoading: isLoadingCart, isEmpty, subtotal, tax } = useCart();
+  const { data: addresses = [], isLoading: isLoadingAddr } = useAddresses();
+  const { confirmCheckout, isConfirming } = useCheckout();
 
   // ── State pilihan user ──────────────────────────────────────
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");

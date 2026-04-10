@@ -50,45 +50,41 @@ export async function getOrderById(userId: string, orderId: string) {
     const order = await prisma.order.findFirst({
         where: { id: orderId, userId },
         select: {
-            id: true,
-            orderNumber: true,
-            status: true,
-            total: true,
-            createdAt: true,
+            id:              true,
+            orderNumber:     true,
+            status:          true,
+            subtotal:        true,
+            tax:             true,
+            shippingCost:    true,
+            total:           true,
+            shippingAddress: true,
+            paymentMethod:   true,
+            shippingMethod:  true,
+            createdAt:       true,
+            updatedAt:       true,
             items: {
                 select: {
-                    id: true,
-                    productId: true,
-                    productName: true,
-                    quantity: true,
-                    unitPrice: true,
-                    subtotal: true,
+                    id:           true,
+                    productId:    true,
+                    productName:  true,
+                    productImage: true,
+                    quantity:     true,
+                    unitPrice:    true,
+                    subtotal:     true,
                     product: {
                         select: {
-                            slug: true,
+                            slug:   true,
                             images: true,
                         }
-
                     }
                 }
             },
-            address: {
-                select: {
-                    recipientName: true,
-                    phone: true,
-                    address: true,
-                    city: true,
-                    province: true,
-                    zipCode: true,
-                }
-            }
         }
     });
 
     if (!order) {
         throw new AppError("Order tidak ditemukan.", 404);
     }
-
 
     return order;
 }
@@ -117,7 +113,7 @@ export async function cancelOrder(userId: string, orderId: string) {
 
 }
 
-//confirmOrder(userId, orderId) — konfirmasi pembayaran (hanya jika status pending_payment) — ubah status jadi processing lalu status ototmatis menjadi confirmed setelah 5 detik (simulasi proses pembayaran) 
+//confirmOrder(userId, orderId) — konfirmasi pembayaran (hanya jika status pending_payment) — ubah status jadi processing lalu status ototmatis menjadi confirmed setelah 5 detik (simulasi proses pembayaran)
 export async function confirmOrder(userId: string, orderId: string) {
     const order = await prisma.order.findFirst({
         where: { id: orderId, userId },

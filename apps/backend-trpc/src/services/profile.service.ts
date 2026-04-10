@@ -1,4 +1,3 @@
-
 import { prisma } from "../config/database";
 import { AppError } from "../middlewares/error.middleware";
 import bcrypt from "bcryptjs";
@@ -33,7 +32,7 @@ export async function changePassword(userId: string, currentPassword: string, ne
     }
 
     const hashPassword = user.passwordHash;
-    
+
 
     const isMatch = await bcrypt.compare(currentPassword, hashPassword);
     if (!isMatch) {
@@ -61,30 +60,40 @@ export async function getAddress( userId : string ){
 }
 
 export async function addAddress( userId : string , data : any ){
-    const { label, recipientName ,phone, address, city , province , zipCode } = data;
+    const { label, recipientName, phone, address, city, province, zipCode, isDefault } = data;
+
+    // Kalau isDefault true, unset semua default lama dulu
+    if (isDefault) {
+        await prisma.address.updateMany({
+            where: { userId, isDefault: true },
+            data:  { isDefault: false },
+        });
+    }
+
     return prisma.address.create({
-        data : {
-            label : label || null,
-            userId, 
-            recipientName ,
+        data: {
+            label:         label || null,
+            userId,
+            recipientName,
             phone,
             address,
-            city ,
-            province ,
-            zipCode
+            city,
+            province,
+            zipCode,
+            isDefault:     isDefault ?? false,
         }
-    })
+    });
 }
 
 export async function updateAddress( userId : string , addressId : string , data : any ){
     const address = await prisma.address.findUnique({
         where : { id : addressId }
     })
-    if( !address || address.userId !== userId ) throw new AppError("Address not found", 404);   
+    if( !address || address.userId !== userId ) throw new AppError("Address not found", 404);
 
     const { label, recipientName ,phone, address : addr, city , province , zipCode } = data;
     return prisma.address.update({
-        where : { id : addressId }, 
+        where : { id : addressId },
         data : {
             label : label || null,
             recipientName ,
@@ -113,13 +122,19 @@ export async function deleteAddress( userId : string , addressId : string ){
 export async function setDefaultAddress( userId : string , addressId : string ){
     const address = await prisma.address.findUnique({
         where : { id : addressId }
-    })
+    });
     if( !address || address.userId !== userId ) throw new AppError("Address not found", 404);
 
-    await prisma.address.update({
-        where : { id : addressId },
-        data : { isDefault : true }
-    })
-
+    await prisma.$transaction([
+        // Unset semua default yang ada dulu
+        prisma.address.updateMany({
+            where: { userId, isDefault: true },
+            data:  { isDefault: false },
+        }),
+        // Set yang dipilih jadi default
+        prisma.address.update({
+            where: { id: addressId },
+            data:  { isDefault: true },
+        }),
+    ]);
 }
-
