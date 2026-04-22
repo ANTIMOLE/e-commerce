@@ -1,9 +1,10 @@
 packages:
   - apps/*
   - packages/*
+  - api-tests
 
 onlyBuiltDependencies:
-  - '@prisma/engines'
+  - "@prisma/engines"
   - bcrypt
   - prisma
   - sharp

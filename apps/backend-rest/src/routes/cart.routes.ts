@@ -19,4 +19,4 @@ cartRoutes.get   ("/",         authenticate, getCartController);
 cartRoutes.post  ("/",         authenticate, validate(addCartItemSchema),    addItemToCartController);
 cartRoutes.patch ("/:itemId",  authenticate, validate(updateCartItemSchema), updateCartItemController);
 cartRoutes.delete("/",         authenticate, clearCartController);
-cartRoutes.delete("/:itemId",  authenticate, validate(cartItemIdSchema),     removeCartItemController);
+cartRoutes.delete("/:itemId", authenticate, removeCartItemController);

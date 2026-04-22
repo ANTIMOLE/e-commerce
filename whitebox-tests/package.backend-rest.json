@@ -1,0 +1,17 @@
+{
+  "_comment": "Tambahkan scripts dan devDependencies ini ke backend-rest/package.json yang sudah ada",
+  "_note": "Merge bagian 'scripts' dan 'devDependencies' ke package.json asli",
+
+  "scripts": {
+    "test:unit": "vitest run --config vitest.unit.config.ts",
+    "test:unit:watch": "vitest --config vitest.unit.config.ts",
+    "test:unit:coverage": "vitest run --config vitest.unit.config.ts --coverage",
+    "test:unit:ui": "vitest --ui --config vitest.unit.config.ts"
+  },
+
+  "devDependencies": {
+    "@vitest/coverage-v8": "^2.0.0",
+    "@vitest/ui": "^2.0.0",
+    "vitest": "^2.0.0"
+  }
+}

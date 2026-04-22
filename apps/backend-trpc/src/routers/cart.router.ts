@@ -33,7 +33,7 @@ export const cartRouter = router({
     .input(
       z.object({
         itemId:   z.string().uuid(),
-        quantity: z.number().int().min(0).max(99),
+        quantity: z.number().int().min(1, "Quantity minimal 1").max(99),
       })
     )
     .mutation(async ({ input, ctx }) => {

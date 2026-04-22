@@ -1,36 +1,28 @@
 import { prisma } from "../config/database";
 import { AppError } from "../middlewares/error.middleware";
 
-
 export interface ProductQuery {
-  page?:       number;
-  limit?:      number;
+  page?: number;
+  limit?: number;
   categoryId?: string;
-  q?:          string;         // search by name
-  minPrice?:   number;
-  maxPrice?:   number;
-  minRating?:  number;
-  sortBy?:     "price" | "rating" | "soldCount" | "createdAt";
-  sortOrder?:  "asc" | "desc";
+  q?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minRating?: number;
+  sortBy?: "price" | "rating" | "soldCount" | "createdAt" | "sold_count" | "created_at"; // Tambahkan snake_case di type
+  sortOrder?: "asc" | "desc";
 }
 
-/**
- * LOGIKA:
- * 1. Build filter `where` dari query params
- * 2. Hitung total data untuk pagination
- * 3. Ambil data dengan skip/take
- * 4. Return data + meta pagination
- */
 export async function getAll(query: ProductQuery) {
   const {
-    page      = 1,
-    limit     = 20,
+    page = 1,
+    limit = 20,
     categoryId,
     q,
     minPrice,
     maxPrice,
     minRating,
-    sortBy    = "createdAt",
+    sortBy = "createdAt",
     sortOrder = "desc",
   } = query;
 
@@ -44,33 +36,43 @@ export async function getAll(query: ProductQuery) {
     ...(minRating && { rating: { gte: minRating } }),
   };
 
-  // 2. Count total
+  // 🛠️ FIX: Mapping Sort Field agar selalu sesuai dengan Schema Prisma
+  const sortMapping: Record<string, string> = {
+    "created_at": "createdAt",
+    "createdAt": "createdAt",
+    "sold_count": "soldCount",
+    "soldCount": "soldCount",
+    "price": "price",
+    "rating": "rating",
+  };
+
+  const finalSortBy = sortMapping[sortBy] || "createdAt";
+
   const total = await prisma.product.count({ where });
 
-  // 3. Ambil data
   const products = await prisma.product.findMany({
     where,
     select: {
-      id:        true,
-      name:      true,
-      slug:      true,
-      price:     true,
-      images:    true,
-      rating:    true,
+      id: true,
+      name: true,
+      slug: true,
+      price: true,
+      images: true,
+      rating: true,
       soldCount: true,
-      location:  true,
-      discount:  true,
-      stock:     true,
-      category:  { select: { id: true, name: true, slug: true } },
+      location: true,
+      discount: true,
+      stock: true,
+      category: { select: { id: true, name: true, slug: true } },
     },
-    orderBy: { [sortBy]: sortOrder },
-    skip:    (page - 1) * limit,
-    take:    limit,
+    // Gunakan finalSortBy yang sudah divalidasi
+    orderBy: { [finalSortBy]: sortOrder },
+    skip: (page - 1) * limit,
+    take: limit,
   });
 
-  // 4. Return dengan meta pagination
   return {
-    data:       products,
+    data: products,
     totalCount: total,
     page,
     totalPages: Math.ceil(total / limit),
@@ -78,29 +80,25 @@ export async function getAll(query: ProductQuery) {
     hasPrevPage: page > 1,
   };
 }
-/**
- * LOGIKA:
- * 1. Cari produk by slug
- * 2. Kalau tidak ada / tidak aktif → throw 404
- * 3. Return data lengkap
- */
+
+// ... sisanya (getBySlug, getById, search) sudah aman ...
 export async function getBySlug(slug: string) {
   const product = await prisma.product.findFirst({
     where: { slug, isActive: true },
     select: {
-      id:          true,
-      name:        true,
-      slug:        true,
+      id: true,
+      name: true,
+      slug: true,
       description: true,
-      price:       true,
-      images:      true,
-      rating:      true,
-      soldCount:   true,
-      stock:       true,
-      location:    true,
-      discount:    true,
-      createdAt:   true,
-      category:    { select: { id: true, name: true, slug: true } },
+      price: true,
+      images: true,
+      rating: true,
+      soldCount: true,
+      stock: true,
+      location: true,
+      discount: true,
+      createdAt: true,
+      category: { select: { id: true, name: true, slug: true } },
     },
   });
 
@@ -111,33 +109,23 @@ export async function getBySlug(slug: string) {
   return product;
 }
 
-/**
- * TODO:
- *
- * LOGIKA:
- * 1. Cari produk by id pakai prisma.product.findUnique
- * 2. Kalau tidak ada → throw AppError("Produk tidak ditemukan", 404)
- * 3. Return produk
- *
- * HINT: Lihat getBySlug di atas — bedanya cuma where: { id } bukan { slug }
- */
 export async function getById(id: string) {
   const product = await prisma.product.findUnique({
     where: { id },
     select: {
-      id:          true,
-      name:        true,
-      slug:        true,
+      id: true,
+      name: true,
+      slug: true,
       description: true,
-      price:       true,
-      images:      true,
-      rating:      true,
-      soldCount:   true,
-      stock:       true,
-      location:    true,
-      discount:    true,
-      createdAt:   true,
-      category:    { select: { id: true, name: true, slug: true } },
+      price: true,
+      images: true,
+      rating: true,
+      soldCount: true,
+      stock: true,
+      location: true,
+      discount: true,
+      createdAt: true,
+      category: { select: { id: true, name: true, slug: true } },
     },
   });
 
@@ -147,17 +135,6 @@ export async function getById(id: string) {
   return product;
 }
 
-/**
- * TODO:
- *
- * LOGIKA:
- * 1. Pakai getAll() yang sudah ada, pass { q: keyword }
- *    → HINT: tinggal return getAll({ q: keyword, ...options })
- * 2. Atau pakai fullTextSearch Prisma (previewFeatures sudah aktif di schema)
- *    → prisma.product.findMany({ where: { name: { search: keyword } } })
- *
- * HINT: Cara paling gampang adalah opsi 1
- */
 export async function search(keyword: string, query?: Omit<ProductQuery, "q">) {
   return getAll({ q: keyword, ...query });
 }

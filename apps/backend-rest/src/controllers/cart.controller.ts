@@ -63,13 +63,13 @@ export async function updateCartItemController(
                 message: "User tidak ditemukan.",
             });
         }
-        const { itemId, quantity } = req.body;
+        const itemId = req.params.itemId as string;
+        const { quantity } = req.body;
         const cart = await cartService.updateCartItem(req.user.id, itemId, quantity);
         res.json({
             success: true,
             message: "Item cart berhasil diperbarui.",
             data: cart,
-
         });
     } catch (error) {
         next(error);
@@ -129,4 +129,3 @@ export async function clearCartController(
         next(error);
     }
 }
-

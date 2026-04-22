@@ -1,0 +1,17 @@
+{
+  "_comment": "Tambahkan scripts dan devDependencies ini ke api-tests/package.json yang sudah ada",
+  "_note": "Merge ke package.json yang sudah ada di api-tests/",
+
+  "scripts": {
+    "test:rest": "vitest run --config vitest.config.ts src/rest.test.ts",
+    "test:trpc": "vitest run --config vitest.config.ts src/trpc.test.ts",
+    "test:security": "vitest run --config vitest.security.config.ts",
+    "test:security:watch": "vitest --config vitest.security.config.ts",
+    "test:integration": "vitest run --config vitest.config.ts src/integration",
+    "test:all": "vitest run --config vitest.config.ts"
+  },
+
+  "devDependencies": {
+    "axios": "^1.7.0"
+  }
+}

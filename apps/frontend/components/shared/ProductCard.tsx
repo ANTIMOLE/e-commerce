@@ -32,6 +32,11 @@ export function ProductCard({ product, className }: ProductCardProps) {
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          onError={(e) => {
+            const target = e.currentTarget;
+            target.srcset = ""; // Clear the srcset so it stops trying to load broken high-res variants
+            target.src = "https://placehold.co/600x400@2x.png";
+          }}
         />
         {/* Discount badge */}
         {product.discount && product.discount > 0 ? (

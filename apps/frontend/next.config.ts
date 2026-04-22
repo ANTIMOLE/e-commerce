@@ -36,25 +36,37 @@ const isTRPC  = apiMode === "trpc";
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
+      { protocol: "https", hostname: "placehold.co" },
       {
         protocol: "https",
-        hostname: "placehold.co",
+        hostname: "images.tokopedia.net",
+        pathname: "/img/**",
       },
     ],
   },
 
+  turbopack: {
+    resolveAlias: isTRPC ? {
+      "@/hooks/useAuth":       "./hooks/trpc/useAuth.ts",
+      "@/hooks/useCart":       "./hooks/trpc/useCart.ts",
+      "@/hooks/useCheckout":   "./hooks/trpc/useCheckout.ts",
+      "@/hooks/useOrders":     "./hooks/trpc/useOrders.ts",
+      "@/hooks/useProducts":   "./hooks/trpc/useProducts.ts",
+      "@/hooks/useProfile":    "./hooks/trpc/useProfile.ts",
+      "@/hooks/useCategories": "./hooks/trpc/useCategories.ts",
+      "@/hooks/useAdmin":      "./hooks/trpc/useAdmin.ts",
+    } : {},
+  },
+
   webpack(config) {
     if (isTRPC) {
-      // Override root hook selectors to point to tRPC implementations
       const hooks = [
         "useAuth", "useCart", "useCheckout", "useOrders",
         "useProducts", "useProfile", "useCategories", "useAdmin",
       ];
-
       hooks.forEach((hook) => {
         config.resolve.alias[`@/hooks/${hook}`] = path.resolve(
-          __dirname,
-          `hooks/trpc/${hook}.ts`
+          __dirname, `hooks/trpc/${hook}.ts`
         );
       });
     }

@@ -6,14 +6,35 @@ import { queryKeys } from "@/lib/queryClient";
 import type { Product, ProductListParams, PaginatedResponse } from "@/types";
 
 // ── useProductList ─────────────────────────────────────────────
+// Mapping camelCase → snake_case untuk sortBy
+const SORT_BY_MAP: Record<string, string> = {
+  createdAt:  "created_at",
+  soldCount:  "sold_count",
+  price:      "price",
+  rating:     "rating",
+};
+
 export function useProductList(params: ProductListParams = {}) {
   return useQuery<PaginatedResponse<Product>>({
     queryKey: queryKeys.products.list(params),
     queryFn: async () => {
-      const res = await api.get("/products", { params });
+      // 1. Bersihkan params dari null, undefined, atau string kosong
+      const filteredParams = Object.fromEntries(
+        Object.entries(params).filter(([_, v]) => v != null && v !== "")
+      );
+
+      // 2. Transform sortBy (pastiin filteredParams ada isinya)
+      if (filteredParams.sortBy) {
+        filteredParams.sortBy = SORT_BY_MAP[filteredParams.sortBy as string] ?? filteredParams.sortBy;
+      }
+
+      console.log("Fetching with params:", filteredParams); // Debug di console browser
+
+      const res = await api.get("/products", { params: filteredParams });
       return res.data;
     },
     staleTime: 60_000,
+    enabled: true,
   });
 }
 
@@ -35,7 +56,7 @@ export function useBestsellers() {
     queryKey: queryKeys.products.bestsellers(),
     queryFn: async () => {
       const res = await api.get<{ success: boolean; data: Product[] }>("/products", {
-        params: { sortBy: "soldCount", sortOrder: "desc", limit: 8 },
+        params: { sortBy: "sold_count", sortOrder: "desc", limit: 8 },
       });
       return res.data.data;
     },
@@ -53,7 +74,7 @@ export function useProductSearch(q: string) {
       });
       return res.data.data;
     },
-    enabled:   q.length >= 2,
+    enabled: q.length >= 2,
     staleTime: 30_000,
   });
 }
@@ -64,7 +85,7 @@ export function useNewArrivals() {
     queryKey: ["products", "newArrivals"],
     queryFn: async () => {
       const res = await api.get<{ success: boolean; data: Product[] }>("/products", {
-        params: { sortBy: "createdAt", sortOrder: "desc", limit: 8 },
+        params: { sortBy: "created_at", sortOrder: "desc", limit: 8 },
       });
       return res.data.data;
     },
@@ -82,7 +103,7 @@ export function useCategoryProducts(categoryId: string, limit = 12) {
       });
       return res.data.data;
     },
-    enabled:   !!categoryId,
+    enabled: !!categoryId,
     staleTime: 60_000,
   });
 }

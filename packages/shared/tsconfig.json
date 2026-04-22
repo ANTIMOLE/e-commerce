@@ -18,5 +18,5 @@
     "types": ["node"]   // ← tambah ini
   },
   "include": ["src/**/*", "prisma/**/*"],   // ← tambah prisma/**/*
-  "exclude": ["node_modules", "dist", "generated"]
+  "exclude": ["node_modules", "dist", "generated", "prisma/cek-image.ts", "prisma/fix-image.ts", "prisma/fix-stock.ts"]
 }

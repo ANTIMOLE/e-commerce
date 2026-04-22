@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { ZodSchema, ZodError } from "zod";
+import { ZodSchema } from "zod";
 
 type RequestPart = "body" | "params" | "query";
 
@@ -16,7 +16,11 @@ export const validate = (schema: ZodSchema, target: RequestPart = "body") => {
       return;
     }
 
-    req[target] = result.data;
+    if (target === "query") {
+      Object.assign(req.query, result.data);
+    } else {
+      req[target] = result.data;
+    }
     next();
   };
 };
@@ -33,7 +37,11 @@ export const validateMultiple = (schemas: Partial<Record<RequestPart, ZodSchema>
         hasError = true;
         allErrors[part] = result.error.flatten().fieldErrors;
       } else {
-        req[part] = result.data;
+        if (part === "query") {
+          Object.assign(req.query, result.data);
+        } else {
+          req[part] = result.data;
+        }
       }
     }
 
