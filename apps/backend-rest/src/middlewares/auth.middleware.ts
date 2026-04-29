@@ -86,19 +86,41 @@ export const authenticate = async (
 };
 
 
+// FIX [High]: optionalAuth sebelumnya memanggil authenticate() yang langsung kirim 401
+// untuk token invalid/expired. Akibatnya user dengan cookie stale gagal buka halaman publik
+// (mis. katalog produk). Fix: lakukan verifikasi inline dan silently skip jika token rusak,
+// sehingga request tetap lanjut sebagai unauthenticated — bukan ditolak.
 export const optionalAuth = async (
   req: AuthRequest,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<void> => {
-  if (!req.cookies?.accessToken) {
+  const token = req.cookies?.accessToken;
+
+  if (!token) {
     next();
     return;
   }
 
   try {
-    await authenticate(req, res, next);
+    const decoded = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+
+    const user = await prisma.user.findUnique({
+      where:  { id: decoded.userId },
+      select: { id: true, role: true },
+    });
+
+    if (user) {
+      req.user = {
+        id:         user.id,
+        role:       user.role as "USER" | "ADMIN",
+        identifier: decoded.identifier,
+      };
+    }
   } catch {
-    next();
+    // Token invalid / expired — abaikan dan lanjut sebagai unauthenticated.
+    // Jangan kirim 401 di sini; route ini memang opsional.
   }
+
+  next();
 };

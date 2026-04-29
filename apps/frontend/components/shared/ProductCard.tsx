@@ -1,10 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Star } from "lucide-react";
 import { cn, formatPrice, formatSoldCount, getImageUrl, truncate } from "@/lib/utils";
-import { ROUTES } from "@/lib/constants";
+import { PLACEHOLDER_IMAGE, ROUTES } from "@/lib/constants";
 import type { Product } from "@/types";
 
 interface ProductCardProps {
@@ -13,7 +14,18 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, className }: ProductCardProps) {
-  const imageUrl = getImageUrl(product.images[0]);
+  // Fallback chain: images[0] (tokopedia URL) → images[1] (local /public/) → placeholder
+  const [imgSrc, setImgSrc] = useState(() => getImageUrl(product.images[0]));
+
+  const handleImageError = () => {
+    const localPath = product.images[1]; // e.g. "images/category/slug.jpg"
+    if (localPath && imgSrc !== `/${localPath}`) {
+      // Try local copy served from /public/
+      setImgSrc(`/${localPath}`);
+    } else {
+      setImgSrc(PLACEHOLDER_IMAGE);
+    }
+  };
 
   return (
     <Link
@@ -27,16 +39,12 @@ export function ProductCard({ product, className }: ProductCardProps) {
       {/* Image */}
       <div className="relative aspect-square overflow-hidden bg-gray-50">
         <Image
-          src={imageUrl}
+          src={imgSrc}
           alt={product.name}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          onError={(e) => {
-            const target = e.currentTarget;
-            target.srcset = ""; // Clear the srcset so it stops trying to load broken high-res variants
-            target.src = "https://placehold.co/600x400@2x.png";
-          }}
+          onError={handleImageError}
         />
         {/* Discount badge */}
         {product.discount && product.discount > 0 ? (

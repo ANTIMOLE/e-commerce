@@ -3,8 +3,6 @@ import type { AuthRequest } from "../middlewares/auth.middleware";
 import * as checkoutService from "../services/checkout.service";
 
 
-//getCheckoutSummary
-
 export async function getCheckoutSummaryController(
     req: AuthRequest,
     res: Response,
@@ -16,10 +14,7 @@ export async function getCheckoutSummaryController(
             ? req.params.orderNumber[0]
             : req.params.orderNumber;
         if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized",
-            });
+            return res.status(401).json({ success: false, message: "Unauthorized" });
         }
         const checkoutSummary = await checkoutService.getCheckoutSummary(userId, orderNumber);
         res.json({
@@ -32,17 +27,19 @@ export async function getCheckoutSummaryController(
     }
 }
 
-//calculateCheckoutSummary
-
 export async function calculateCheckoutSummaryController(
     req: AuthRequest,
     res: Response,
     next: NextFunction
 ) {
     try {
-
-        const { cartId } = req.body;
-        const checkoutSummary = await checkoutService.calculateCheckoutSummary(cartId);
+        const userId = req.user?.id;
+        if (!userId) {
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        }
+        const { cartId, shippingMethod } = req.body;
+        // FIX [Critical]: pass userId ke service supaya kepemilikan cart diverifikasi
+        const checkoutSummary = await checkoutService.calculateCheckoutSummary(userId, cartId, shippingMethod);
         res.json({
             success: true,
             message: "Checkout summary calculated successfully",
@@ -53,8 +50,6 @@ export async function calculateCheckoutSummaryController(
     }
 }
 
-//confirmCheckout
-
 export async function confirmCheckoutController(
     req: AuthRequest,
     res: Response,
@@ -64,10 +59,7 @@ export async function confirmCheckoutController(
         const userId = req.user?.id;
         const { cartId, addressId, paymentMethod, shippingMethod } = req.body;
         if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: "Unauthorized",
-            });
+            return res.status(401).json({ success: false, message: "Unauthorized" });
         }
         const order = await checkoutService.confirmCheckout(userId, cartId, addressId, paymentMethod, shippingMethod);
         res.json({
@@ -79,6 +71,3 @@ export async function confirmCheckoutController(
         next(error);
     }
 }
-
-
-

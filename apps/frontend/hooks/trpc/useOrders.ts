@@ -55,10 +55,11 @@ export function useOrderDetail(orderId: string) {
 
 // ── useCancelOrder ─────────────────────────────────────────────
 export function useCancelOrder() {
-  const qc = useQueryClient();
+  const utils = trpc.useUtils();
   return trpc.order.cancel.useMutation({
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: queryKeys.orders.all });
+      // FIX [High]: invalidate order cache via tRPC utils
+      void utils.order.getAll.invalidate();
       toast.success("Pesanan berhasil dibatalkan");
     },
     onError: (err: { message: string }) => toast.error(err.message),

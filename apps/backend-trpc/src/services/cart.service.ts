@@ -58,10 +58,11 @@ export async function getCartByUserId(userId: string) {
     }
 
     // Reaktivasi cart kalau statusnya bukan active
-    if (cart.status !== "active") {
-        cart = await prisma.cart.update({
-            where: { id: cart.id },
-            data: { status: "active" },
+    // Buat cart baru kalau yang ada sudah checked_out — jangan reaktivasi
+    // supaya status checked_out bisa dipakai sebagai audit trail yang valid
+    if (cart.status === "checked_out") {
+        cart = await prisma.cart.create({
+            data: { userId, status: "active" },
             select: cartSelect,
         });
     }
@@ -138,9 +139,10 @@ export async function addItemToCart(userId: string, productId: string, quantity:
         select: { id: true, price: true, discount: true, stock: true },
     });
     if (!product) throw new AppError("Produk tidak ditemukan.", 404);
-    if (product.stock < quantity) throw new AppError("Stok tidak cukup.", 400);
 
     const existingItem = cart.items.find(item => item.productId === productId);
+    const totalQuantity = (existingItem?.quantity ?? 0) + quantity;
+    if (product.stock < totalQuantity) throw new AppError("Stok tidak cukup.", 400)
     if (existingItem) {
         // Update quantity
         await prisma.cartItem.update({

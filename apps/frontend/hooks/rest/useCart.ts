@@ -38,7 +38,7 @@ function computeCartSummary(cart: RawCart | undefined) {
   const subtotal = cart.items.reduce(
     (sum, item) => sum + Number(item.priceAtTime) * item.quantity, 0
   );
-  const tax   = Math.round(subtotal * 0.1);
+  const tax   = Math.round(subtotal * 0.11);
   const total = subtotal + tax;
   return { subtotal, tax, total, itemCount: cart.items.length };
 }

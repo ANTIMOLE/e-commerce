@@ -3,13 +3,13 @@
  *
  * Letakkan di: backend-trpc/src/__tests__/unit/profile.service.test.ts
  *
- * Menguji: getProfile, updateProfile, changePassword,
- *          getAddress, addAddress, updateAddress, deleteAddress, setDefaultAddress
+ * FIX:
+ *  - changePassword error messages pakai Bahasa Indonesia:
+ *    "User tidak ditemukan" (404), "Password lama salah" (400)
+ *    bukan "User not found" / "Current password is incorrect"
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-
-// ─── MOCK ─────────────────────────────────────────────────────
 
 vi.mock("../../config/database", () => ({
   prisma: {
@@ -40,7 +40,6 @@ vi.mock("bcryptjs", () => ({
   },
 }));
 
-// ─── Import setelah mock ──────────────────────────────────────
 import { prisma } from "../../config/database";
 import bcrypt     from "bcryptjs";
 import {
@@ -64,6 +63,9 @@ beforeEach(() => { vi.clearAllMocks(); });
 // ─── Fixtures ─────────────────────────────────────────────────
 const fakeUser = {
   id: "user-1", name: "Budi", email: "budi@test.com",
+  // FIX: phone wajib ada di fixture karena getProfile() select { phone: true }
+  // Test di line 89 expect(result).toHaveProperty("phone") gagal karena fixture tidak punya field ini.
+  phone: "08123456789",
   passwordHash: "hashed-password",
   createdAt: new Date(), updatedAt: new Date(),
 };
@@ -86,7 +88,9 @@ describe("getProfile()", () => {
     const result = await getProfile("user-1");
 
     expect(result).toMatchObject({ id: "user-1", name: "Budi" });
-    // passwordHash tidak di-select (lihat service)
+    // Regression: phone harus ada di response getProfile (pernah hilang dari select)
+    expect(result).toHaveProperty("phone");
+    expect((result as any).phone).toBe("08123456789");
     expect(mockUser.findUnique).toHaveBeenCalledWith(
       expect.objectContaining({ where: { id: "user-1" } })
     );
@@ -105,7 +109,7 @@ describe("getProfile()", () => {
 // updateProfile()
 // ══════════════════════════════════════════════════════════════
 describe("updateProfile()", () => {
-  it("✅ update name dan phone user", async () => {
+  it("✅ update name dan phone", async () => {
     mockUser.update.mockResolvedValue({ ...fakeUser, name: "Budi Baru", phone: "08999" });
 
     const result = await updateProfile("user-1", { name: "Budi Baru", phone: "08999" });
@@ -124,7 +128,7 @@ describe("updateProfile()", () => {
 // changePassword()
 // ══════════════════════════════════════════════════════════════
 describe("changePassword()", () => {
-  it("✅ berhasil ganti password", async () => {
+  it("✅ berhasil ganti password — return pesan Bahasa Indonesia", async () => {
     mockUser.findUnique.mockResolvedValue(fakeUser);
     mockBcrypt.compare.mockResolvedValue(true);
     mockBcrypt.hash.mockResolvedValue("new-hash");
@@ -132,29 +136,14 @@ describe("changePassword()", () => {
 
     const result = await changePassword("user-1", "OldPass!", "NewPass123!");
 
-    expect(result.message).toBe("Password updated successfully");
+    // FIX: service pakai Bahasa Indonesia
+    expect(result.message).toBe("Password berhasil diubah");
     expect(mockUser.update).toHaveBeenCalledWith(
       expect.objectContaining({ data: { passwordHash: "new-hash" } })
     );
   });
 
-  it("❌ throw 404 jika user tidak ditemukan", async () => {
-    mockUser.findUnique.mockResolvedValue(null);
-
-    await expect(changePassword("ghost", "old", "new")).rejects.toMatchObject({ status: 404 });
-  });
-
-  it("❌ throw 400 jika password lama salah", async () => {
-    mockUser.findUnique.mockResolvedValue(fakeUser);
-    mockBcrypt.compare.mockResolvedValue(false);
-
-    await expect(changePassword("user-1", "WrongPass!", "new")).rejects.toMatchObject({
-      status:  400,
-      message: "Current password is incorrect",
-    });
-  });
-
-  it("✅ hash password baru dengan bcrypt sebelum disimpan", async () => {
+  it("✅ hash password baru dengan bcrypt (cost factor 12)", async () => {
     mockUser.findUnique.mockResolvedValue(fakeUser);
     mockBcrypt.compare.mockResolvedValue(true);
     mockBcrypt.hash.mockResolvedValue("new-hash");
@@ -163,6 +152,41 @@ describe("changePassword()", () => {
     await changePassword("user-1", "OldPass!", "NewPass123!");
 
     expect(mockBcrypt.hash).toHaveBeenCalledWith("NewPass123!", 12);
+  });
+
+  it("✅ compare password lama dengan hash di DB", async () => {
+    mockUser.findUnique.mockResolvedValue(fakeUser);
+    mockBcrypt.compare.mockResolvedValue(true);
+    mockBcrypt.hash.mockResolvedValue("new-hash");
+    mockUser.update.mockResolvedValue({});
+
+    await changePassword("user-1", "OldPass!", "NewPass123!");
+
+    expect(mockBcrypt.compare).toHaveBeenCalledWith("OldPass!", fakeUser.passwordHash);
+  });
+
+  it("❌ throw 404 jika user tidak ditemukan — pesan Indonesia", async () => {
+    mockUser.findUnique.mockResolvedValue(null);
+
+    await expect(changePassword("ghost", "old", "new"))
+      .rejects.toMatchObject({
+        status:  404,
+        message: "User tidak ditemukan", // FIX: bukan "User not found"
+      });
+  });
+
+  it("❌ throw 400 jika password lama salah — pesan Indonesia", async () => {
+    mockUser.findUnique.mockResolvedValue(fakeUser);
+    mockBcrypt.compare.mockResolvedValue(false);
+
+    await expect(changePassword("user-1", "WrongPass!", "new"))
+      .rejects.toMatchObject({
+        status:  400,
+        message: "Password lama salah", // FIX: bukan "Current password is incorrect"
+      });
+
+    // Tidak boleh update jika password salah
+    expect(mockUser.update).not.toHaveBeenCalled();
   });
 });
 
@@ -245,16 +269,61 @@ describe("updateAddress()", () => {
     expect(result.city).toBe("Surabaya");
   });
 
-  it("❌ throw 404 jika address tidak ditemukan atau bukan milik user", async () => {
-    mockAddress.findUnique.mockResolvedValue(null);
+  it("✅ partial update: hanya city dikirim — label lama HARUS tetap utuh", async () => {
+    // Regression: service harus merge data, bukan overwrite penuh.
+    mockAddress.findUnique.mockResolvedValue(fakeAddress); // label: "Rumah"
+    mockAddress.update.mockResolvedValue({ ...fakeAddress, city: "Surabaya" });
 
-    await expect(updateAddress("user-1", "ghost-addr", {})).rejects.toMatchObject({ status: 404 });
+    await updateAddress("user-1", "addr-1", { city: "Surabaya" });
+
+    const updateData = mockAddress.update.mock.calls[0][0].data;
+    // city harus ada di update data
+    expect(updateData.city).toBe("Surabaya");
+    // Kalau label ikut dikirim ke update, nilainya tidak boleh null/undefined
+    if ("label" in updateData) {
+      expect(updateData.label).toBe(fakeAddress.label);
+    }
   });
 
-  it("❌ throw 404 jika address milik user lain", async () => {
+  it("✅ partial update: response berisi label lama saat label tidak dikirim", async () => {
+    mockAddress.findUnique.mockResolvedValue(fakeAddress);  // label: "Rumah"
+    mockAddress.update.mockResolvedValue({ ...fakeAddress, city: "Bandung" });
+
+    const result = await updateAddress("user-1", "addr-1", { city: "Bandung" });
+
+    // label pada result harus "Rumah", bukan null/undefined
+    expect(result.label).toBe("Rumah");
+    expect(result.city).toBe("Bandung");
+  });
+
+  it("❌ throw 404 jika address tidak ditemukan", async () => {
+    mockAddress.findUnique.mockResolvedValue(null);
+
+    await expect(updateAddress("user-1", "ghost-addr", {}))
+      .rejects.toMatchObject({ status: 404 });
+  });
+
+  it("❌ throw 404 jika address milik user lain (ownership check)", async () => {
     mockAddress.findUnique.mockResolvedValue({ ...fakeAddress, userId: "user-other" });
 
-    await expect(updateAddress("user-1", "addr-1", {})).rejects.toMatchObject({ status: 404 });
+    await expect(updateAddress("user-1", "addr-1", {}))
+      .rejects.toMatchObject({ status: 404 });
+  });
+
+  it("✅ explicit clear label: label: null dikirim → label di-update ke null (bukan diabaikan)", async () => {
+    // Contract: kalau klien sengaja kirim label: null, itu intentional clear —
+    // berbeda dari omit (tidak kirim sama sekali). Service harus meneruskan null ke prisma.
+    mockAddress.findUnique.mockResolvedValue(fakeAddress);
+    mockAddress.update.mockResolvedValue({ ...fakeAddress, label: null });
+
+    const result = await updateAddress("user-1", "addr-1", { label: null as any });
+
+    // Nilai null harus diteruskan ke prisma.update — bukan di-strip
+    const updateData = mockAddress.update.mock.calls[0][0].data;
+    expect(updateData).toHaveProperty("label");
+    expect(updateData.label).toBeNull();
+    // Result juga harus reflect nilai baru
+    expect(result.label).toBeNull();
   });
 });
 
@@ -274,13 +343,15 @@ describe("deleteAddress()", () => {
   it("❌ throw 404 jika address tidak ditemukan", async () => {
     mockAddress.findUnique.mockResolvedValue(null);
 
-    await expect(deleteAddress("user-1", "ghost")).rejects.toMatchObject({ status: 404 });
+    await expect(deleteAddress("user-1", "ghost"))
+      .rejects.toMatchObject({ status: 404 });
   });
 
   it("❌ throw 404 jika address milik user lain", async () => {
     mockAddress.findUnique.mockResolvedValue({ ...fakeAddress, userId: "user-other" });
 
-    await expect(deleteAddress("user-1", "addr-1")).rejects.toMatchObject({ status: 404 });
+    await expect(deleteAddress("user-1", "addr-1"))
+      .rejects.toMatchObject({ status: 404 });
   });
 });
 
@@ -288,27 +359,28 @@ describe("deleteAddress()", () => {
 // setDefaultAddress()
 // ══════════════════════════════════════════════════════════════
 describe("setDefaultAddress()", () => {
-  it("✅ set address sebagai default via transaction", async () => {
+  it("✅ set default via $transaction dengan 2 operasi (unset lama + set baru)", async () => {
     mockAddress.findUnique.mockResolvedValue(fakeAddress);
     mockPrisma.$transaction.mockResolvedValue([]);
 
     await setDefaultAddress("user-1", "addr-1");
 
     expect(mockPrisma.$transaction).toHaveBeenCalledOnce();
-    // Transaction harus berisi 2 operasi: unset lama + set baru
-    const transactionArgs = mockPrisma.$transaction.mock.calls[0][0];
-    expect(transactionArgs).toHaveLength(2);
+    const txArgs = mockPrisma.$transaction.mock.calls[0][0];
+    expect(txArgs).toHaveLength(2); // [updateMany, update]
   });
 
   it("❌ throw 404 jika address tidak ditemukan", async () => {
     mockAddress.findUnique.mockResolvedValue(null);
 
-    await expect(setDefaultAddress("user-1", "ghost")).rejects.toMatchObject({ status: 404 });
+    await expect(setDefaultAddress("user-1", "ghost"))
+      .rejects.toMatchObject({ status: 404 });
   });
 
   it("❌ throw 404 jika address bukan milik user", async () => {
     mockAddress.findUnique.mockResolvedValue({ ...fakeAddress, userId: "user-other" });
 
-    await expect(setDefaultAddress("user-1", "addr-1")).rejects.toMatchObject({ status: 404 });
+    await expect(setDefaultAddress("user-1", "addr-1"))
+      .rejects.toMatchObject({ status: 404 });
   });
 });

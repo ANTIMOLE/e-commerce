@@ -11,8 +11,52 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useProductDetail } from "@/hooks/useProducts";
 import { formatPrice, formatSoldCount, getImageUrl } from "@/lib/utils";
-import { ROUTES } from "@/lib/constants";
+import { PLACEHOLDER_IMAGE, ROUTES } from "@/lib/constants";
 import { useCart } from "@/hooks/useCart";
+
+// ── ProductDetailImage ──────────────────────────────────────
+// Sub-component terpisah agar useState untuk fallback image
+// tidak melanggar Rules of Hooks (ada conditional return di atas).
+// Fallback chain: images[0] (tokopedia) → images[1] (local /public/) → placeholder
+function ProductDetailImage({
+  images,
+  name,
+  discount,
+}: {
+  images: string[];
+  name: string;
+  discount?: number | null;
+}) {
+  const [imgSrc, setImgSrc] = useState(() => getImageUrl(images[0]));
+
+  const handleError = () => {
+    const localPath = images[1]; // e.g. "images/category/slug.jpg"
+    if (localPath && imgSrc !== `/${localPath}`) {
+      setImgSrc(`/${localPath}`);
+    } else {
+      setImgSrc(PLACEHOLDER_IMAGE);
+    }
+  };
+
+  return (
+    <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-50 border">
+      <Image
+        src={imgSrc}
+        alt={name}
+        fill
+        className="object-cover"
+        sizes="(max-width: 768px) 100vw, 384px"
+        priority
+        onError={handleError}
+      />
+      {discount && discount > 0 ? (
+        <span className="absolute top-3 left-3 bg-red-500 text-white text-sm font-bold px-2 py-1 rounded-lg">
+          -{discount}%
+        </span>
+      ) : null}
+    </div>
+  );
+}
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -62,7 +106,6 @@ export default function ProductDetailPage({ params }: Props) {
     );
   }
 
-  const imageUrl    = getImageUrl(product.images[0]);
   const isAvailable = product.stock > 0;
   const discountedPrice = product.discount && product.discount > 0
     ? product.price * (1 - product.discount / 100)
@@ -102,22 +145,12 @@ export default function ProductDetailPage({ params }: Props) {
       <div className="flex flex-col md:flex-row gap-8">
 
         {/* ── Image ───────────────────────────────────────────── */}
-        <div className="w-full md:w-96 flex-shrink-0">
-          <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-50 border">
-            <Image
-              src={imageUrl}
-              alt={product.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 384px"
-              priority
-            />
-            {product.discount && product.discount > 0 ? (
-              <span className="absolute top-3 left-3 bg-red-500 text-white text-sm font-bold px-2 py-1 rounded-lg">
-                -{product.discount}%
-              </span>
-            ) : null}
-          </div>
+        <div className="w-full md:w-96 shrink-0">
+          <ProductDetailImage
+            images={product.images}
+            name={product.name}
+            discount={product.discount}
+          />
         </div>
 
         {/* ── Info ────────────────────────────────────────────── */}

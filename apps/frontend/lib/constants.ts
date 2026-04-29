@@ -96,7 +96,10 @@ export const ROUTES = {
     ADDRESS:  "/checkout/address",
     SHIPPING: "/checkout/shipping",
     PAYMENT:  "/checkout/payment",
-    SUCCESS:  (orderId: string) => `/checkout/success/${orderId}`,
+    // FIX [Medium]: success page membaca params via useSearchParams() (query string),
+    // bukan route param. Helper lama menunjuk ke path yang tidak ada.
+    SUCCESS:  (orderId: string, orderNumber?: string) =>
+      `/checkout/success?orderId=${orderId}${orderNumber ? `&orderNumber=${orderNumber}` : ""}`,
   },
   ORDERS:       "/orders",
   ORDER_DETAIL: (id: string) => `/orders/${id}`,

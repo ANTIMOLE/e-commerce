@@ -63,8 +63,10 @@ export async function changePasswordController(
             });
             return;
         }
-        const { currentPassword, newPassword } = req.body;
-        const result = await profileService.changePassword(req.user.id, currentPassword, newPassword);
+        // FIX [Critical]: schema mewajibkan `oldPassword`, bukan `currentPassword`.
+        // Sebelumnya controller membaca `currentPassword` sehingga selalu undefined.
+        const { oldPassword, newPassword } = req.body;
+        const result = await profileService.changePassword(req.user.id, oldPassword, newPassword);
         res.json({
             success: true,
             message: result.message,
@@ -198,5 +200,3 @@ export async function deleteAddressController(
         next(error);
     }
 }
-
-

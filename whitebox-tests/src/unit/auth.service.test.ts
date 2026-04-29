@@ -86,12 +86,12 @@ const mockAdminUser = {
 };
 
 // Typed convenience refs
-const mockPrismaUser = prisma.user as {
+const mockPrismaUser = prisma.user as unknown as {
   findUnique: ReturnType<typeof vi.fn>;
   create: ReturnType<typeof vi.fn>;
   update: ReturnType<typeof vi.fn>;
 };
-const mockPrismaRefreshToken = prisma.refreshToken as {
+const mockPrismaRefreshToken = prisma.refreshToken as unknown as {
   create: ReturnType<typeof vi.fn>;
   findMany: ReturnType<typeof vi.fn>;
   updateMany: ReturnType<typeof vi.fn>;
@@ -134,7 +134,9 @@ describe("authService.register()", () => {
     mockJwt.sign
       .mockReturnValueOnce("access-token-xxx")
       .mockReturnValueOnce("refresh-token-xxx");
-    mockBcrypt.hash.mockResolvedValueOnce("$2b$12$hashed").mockResolvedValueOnce("$2b$10$refreshhashed");
+    mockBcrypt.hash
+      .mockResolvedValueOnce("$2b$12$hashed")
+      .mockResolvedValueOnce("$2b$10$refreshhashed");
     mockPrismaRefreshToken.create.mockResolvedValue({});
 
     // Act
@@ -250,12 +252,20 @@ describe("authService.login()", () => {
     // membedakan mana yang salah (email atau password)
     mockPrismaUser.findUnique.mockResolvedValue(null);
     let errNoEmail: AppError | null = null;
-    try { await authService.login(loginInput); } catch (e) { errNoEmail = e as AppError; }
+    try {
+      await authService.login(loginInput);
+    } catch (e) {
+      errNoEmail = e as AppError;
+    }
 
     mockPrismaUser.findUnique.mockResolvedValue(mockUser);
     mockBcrypt.compare.mockResolvedValue(false);
     let errBadPass: AppError | null = null;
-    try { await authService.login(loginInput); } catch (e) { errBadPass = e as AppError; }
+    try {
+      await authService.login(loginInput);
+    } catch (e) {
+      errBadPass = e as AppError;
+    }
 
     expect(errNoEmail?.message).toBe(errBadPass?.message);
     expect(errNoEmail?.status).toBe(errBadPass?.status);
@@ -311,7 +321,7 @@ describe("authService.refreshToken()", () => {
     expect(result).toBe("new-access-token");
     expect(mockJwt.verify).toHaveBeenCalledWith(
       rawToken,
-      "test-refresh-secret-minimum-32-chars-long"
+      "test-refresh-secret-minimum-32-chars-long",
     );
   });
 
@@ -337,7 +347,11 @@ describe("authService.refreshToken()", () => {
   it("❌ throw 401 jika token hash tidak cocok (token dicuri/dimanipulasi)", async () => {
     mockJwt.verify.mockReturnValue({ userId: "user-uuid-123" });
     mockPrismaRefreshToken.findMany.mockResolvedValue([
-      { tokenHash: "$2b$10$different_hash", expiresAt: new Date(Date.now() + 10000), revoked: false },
+      {
+        tokenHash: "$2b$10$different_hash",
+        expiresAt: new Date(Date.now() + 10000),
+        revoked: false,
+      },
     ]);
     mockBcrypt.compare.mockResolvedValue(false); // tidak cocok
 
@@ -377,7 +391,7 @@ describe("authService.changePassword()", () => {
     const result = await authService.changePassword(
       "user-uuid-123",
       "OldPass123!",
-      "NewPass456!"
+      "NewPass456!",
     );
 
     expect(result).toMatchObject({ message: expect.any(String) });
@@ -385,7 +399,7 @@ describe("authService.changePassword()", () => {
     expect(mockBcrypt.hash).toHaveBeenCalledWith("NewPass456!", 12);
     // Refresh token harus di-revoke (paksa login ulang)
     expect(mockPrismaRefreshToken.updateMany).toHaveBeenCalledWith(
-      expect.objectContaining({ data: { revoked: true } })
+      expect.objectContaining({ data: { revoked: true } }),
     );
   });
 
@@ -393,7 +407,7 @@ describe("authService.changePassword()", () => {
     mockPrismaUser.findUnique.mockResolvedValue(null);
 
     await expect(
-      authService.changePassword("ghost-id", "old", "new")
+      authService.changePassword("ghost-id", "old", "new"),
     ).rejects.toMatchObject({ status: 404 });
   });
 
@@ -402,7 +416,7 @@ describe("authService.changePassword()", () => {
     mockBcrypt.compare.mockResolvedValue(false);
 
     await expect(
-      authService.changePassword("user-uuid-123", "WrongOld!", "NewPass456!")
+      authService.changePassword("user-uuid-123", "WrongOld!", "NewPass456!"),
     ).rejects.toMatchObject({ status: 400 });
 
     // Password TIDAK boleh diupdate jika verifikasi gagal

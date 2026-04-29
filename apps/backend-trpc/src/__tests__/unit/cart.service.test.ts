@@ -3,13 +3,12 @@
  *
  * Letakkan di: backend-trpc/src/__tests__/unit/cart.service.test.ts
  *
- * Menguji: getCartByUserId, addItemToCart, updateCartItem,
- *          removeCartItem, clearCart
+ * FIX:
+ *  - checked_out cart → CREATE cart baru (bukan update status: active)
+ *  - Tambah test: quantity cap, price sync, total quantity guard
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-
-// ─── MOCK ─────────────────────────────────────────────────────
 
 vi.mock("../../config/database", () => ({
   prisma: {
@@ -23,12 +22,10 @@ vi.mock("../../config/env", () => ({
   env: { NODE_ENV: "test" },
 }));
 
-// Prisma type-only import — mock supaya tidak crash
 vi.mock("@ecommerce/shared/generated/prisma", () => ({
   Prisma: {},
 }));
 
-// ─── Import setelah mock ──────────────────────────────────────
 import { prisma } from "../../config/database";
 import {
   getCartByUserId,
@@ -45,20 +42,23 @@ const mockProduct  = prisma.product  as unknown as Record<string, ReturnType<typ
 beforeEach(() => { vi.clearAllMocks(); });
 
 // ─── Fixtures ─────────────────────────────────────────────────
-const makeCart = (overrides = {}) => ({
-  id: "cart-1", userId: "user-1", status: "active",
-  items: [],
+const makeProduct = (overrides = {}) => ({
+  name: "Sepatu", images: [], categoryId: "cat-1",
+  slug: "sepatu", price: 100000, stock: 10,
+  discount: 0, description: "ok",
   ...overrides,
 });
 
 const makeItem = (overrides = {}) => ({
   id: "item-1", productId: "prod-1", quantity: 2,
   priceAtTime: 100000,
-  product: {
-    name: "Sepatu", images: [], categoryId: "cat-1",
-    slug: "sepatu", price: 100000, stock: 10,
-    discount: 0, description: "ok",
-  },
+  product: makeProduct(),
+  ...overrides,
+});
+
+const makeCart = (overrides = {}) => ({
+  id: "cart-1", userId: "user-1", status: "active",
+  items: [],
   ...overrides,
 });
 
@@ -67,13 +67,13 @@ const makeItem = (overrides = {}) => ({
 // ══════════════════════════════════════════════════════════════
 describe("getCartByUserId()", () => {
   it("✅ return cart aktif yang sudah ada", async () => {
-    const cart = makeCart({ items: [] });
-    mockCart.findUnique.mockResolvedValue(cart);
+    mockCart.findUnique.mockResolvedValue(makeCart());
 
     const result = await getCartByUserId("user-1");
 
     expect(result.id).toBe("cart-1");
     expect(mockCart.create).not.toHaveBeenCalled();
+    expect(mockCart.update).not.toHaveBeenCalled();
   });
 
   it("✅ buat cart baru jika user belum punya cart", async () => {
@@ -87,31 +87,53 @@ describe("getCartByUserId()", () => {
     );
   });
 
-  it("✅ reaktivasi cart jika status bukan active", async () => {
-    const inactiveCart = makeCart({ status: "checked_out" });
-    mockCart.findUnique.mockResolvedValue(inactiveCart);
-    mockCart.update.mockResolvedValue(makeCart({ status: "active" }));
+  it("✅ buat cart BARU jika status checked_out — BUKAN reaktivasi via update", async () => {
+    // FIX: service terbaru CREATE cart baru, bukan update status → active
+    const checkedOutCart = makeCart({ status: "checked_out" });
+    const newCart = makeCart({ id: "cart-2", status: "active" });
+    mockCart.findUnique.mockResolvedValue(checkedOutCart);
+    mockCart.create.mockResolvedValue(newCart);
 
-    await getCartByUserId("user-1");
+    const result = await getCartByUserId("user-1");
 
-    expect(mockCart.update).toHaveBeenCalledWith(
-      expect.objectContaining({ data: { status: "active" } })
+    // Harus CREATE — checked_out jadi audit trail yang valid
+    expect(mockCart.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: { userId: "user-1", status: "active" } })
     );
+    expect(result.id).toBe("cart-2");
+    // update TIDAK boleh dipanggil untuk reaktivasi
+    expect(mockCart.update).not.toHaveBeenCalled();
   });
 
   it("✅ item dengan stock 0 otomatis dihapus dari cart", async () => {
-    const outOfStockItem = makeItem({ product: { ...makeItem().product, stock: 0 } });
-    const cart = makeCart({ items: [outOfStockItem] });
-    mockCart.findUnique.mockResolvedValue(cart);
+    const outOfStockItem = makeItem({ product: makeProduct({ stock: 0 }) });
+    mockCart.findUnique.mockResolvedValue(makeCart({ items: [outOfStockItem] }));
     mockCart.update.mockResolvedValue(makeCart({ items: [] }));
 
     await getCartByUserId("user-1");
 
-    // update pertama = hapus item out of stock
     expect(mockCart.update).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
           items: expect.objectContaining({ deleteMany: expect.any(Object) }),
+        }),
+      })
+    );
+  });
+
+  it("✅ item quantity > stock di-cap ke nilai stock", async () => {
+    const overQtyItem = makeItem({ quantity: 20, product: makeProduct({ stock: 5 }) });
+    mockCart.findUnique.mockResolvedValue(makeCart({ items: [overQtyItem] }));
+    mockCart.update
+      .mockResolvedValueOnce(makeCart({ items: [makeItem({ quantity: 5 })] }))
+      .mockResolvedValueOnce(makeCart({ items: [makeItem({ quantity: 5 })] }));
+
+    await getCartByUserId("user-1");
+
+    expect(mockCart.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          items: expect.objectContaining({ updateMany: expect.any(Array) }),
         }),
       })
     );
@@ -154,19 +176,32 @@ describe("addItemToCart()", () => {
     mockCart.findUnique.mockResolvedValue(makeCart({ items: [] }));
     mockProduct.findUnique.mockResolvedValue(null);
 
-    await expect(addItemToCart("user-1", "ghost", 1)).rejects.toMatchObject({ status: 404 });
+    await expect(addItemToCart("user-1", "ghost", 1))
+      .rejects.toMatchObject({ status: 404 });
   });
 
-  it("❌ throw 400 jika stok tidak cukup", async () => {
+  it("❌ throw 400 jika stok tidak cukup untuk total quantity", async () => {
     mockCart.findUnique.mockResolvedValue(makeCart({ items: [] }));
     mockProduct.findUnique.mockResolvedValue({
       id: "prod-1", price: 100000, discount: 0, stock: 2,
     });
 
-    await expect(addItemToCart("user-1", "prod-1", 10)).rejects.toMatchObject({ status: 400 });
+    await expect(addItemToCart("user-1", "prod-1", 10))
+      .rejects.toMatchObject({ status: 400 });
   });
 
-  it("✅ harga diskon dihitung dengan benar saat tambah item", async () => {
+  it("❌ throw 400 jika total (existing + baru) > stock", async () => {
+    const existingItem = makeItem({ quantity: 8 });
+    mockCart.findUnique.mockResolvedValue(makeCart({ items: [existingItem] }));
+    mockProduct.findUnique.mockResolvedValue({
+      id: "prod-1", price: 100000, discount: 0, stock: 10,
+    });
+
+    await expect(addItemToCart("user-1", "prod-1", 5)) // 8 + 5 = 13 > 10
+      .rejects.toMatchObject({ status: 400 });
+  });
+
+  it("✅ harga diskon dihitung benar (price × (1 - discount/100))", async () => {
     mockCart.findUnique.mockResolvedValue(makeCart({ items: [] }));
     mockProduct.findUnique.mockResolvedValue({
       id: "prod-1", price: 100000, discount: 10, stock: 10,
@@ -176,8 +211,20 @@ describe("addItemToCart()", () => {
     await addItemToCart("user-1", "prod-1", 1);
 
     const createArg = mockCartItem.create.mock.calls[0][0];
-    // 100000 * (1 - 10/100) = 90000
-    expect(createArg.data.priceAtTime).toBe(90000);
+    expect(createArg.data.priceAtTime).toBe(90000); // 100000 * 0.9
+  });
+
+  it("✅ harga tanpa diskon = price asli", async () => {
+    mockCart.findUnique.mockResolvedValue(makeCart({ items: [] }));
+    mockProduct.findUnique.mockResolvedValue({
+      id: "prod-1", price: 150000, discount: 0, stock: 10,
+    });
+    mockCartItem.create.mockResolvedValue({});
+
+    await addItemToCart("user-1", "prod-1", 1);
+
+    const createArg = mockCartItem.create.mock.calls[0][0];
+    expect(createArg.data.priceAtTime).toBe(150000);
   });
 });
 
@@ -197,7 +244,7 @@ describe("updateCartItem()", () => {
     );
   });
 
-  it("✅ hapus item jika quantity = 0", async () => {
+  it("✅ hapus item jika quantity = 0 (auto-remove via delete)", async () => {
     mockCart.findUnique.mockResolvedValue(makeCart({ items: [makeItem()] }));
     mockCartItem.delete.mockResolvedValue({});
 
@@ -210,14 +257,16 @@ describe("updateCartItem()", () => {
   it("❌ throw 404 jika item tidak ada di cart", async () => {
     mockCart.findUnique.mockResolvedValue(makeCart({ items: [] }));
 
-    await expect(updateCartItem("user-1", "ghost-item", 1)).rejects.toMatchObject({ status: 404 });
+    await expect(updateCartItem("user-1", "ghost-item", 1))
+      .rejects.toMatchObject({ status: 404 });
   });
 
   it("❌ throw 400 jika stok kurang dari quantity baru", async () => {
     mockCart.findUnique.mockResolvedValue(makeCart({ items: [makeItem()] }));
     mockProduct.findUnique.mockResolvedValue({ stock: 3 });
 
-    await expect(updateCartItem("user-1", "item-1", 10)).rejects.toMatchObject({ status: 400 });
+    await expect(updateCartItem("user-1", "item-1", 10))
+      .rejects.toMatchObject({ status: 400 });
   });
 });
 
@@ -237,7 +286,8 @@ describe("removeCartItem()", () => {
   it("❌ throw 404 jika item tidak ada di cart user", async () => {
     mockCart.findUnique.mockResolvedValue(makeCart({ items: [] }));
 
-    await expect(removeCartItem("user-1", "ghost-item")).rejects.toMatchObject({ status: 404 });
+    await expect(removeCartItem("user-1", "ghost-item"))
+      .rejects.toMatchObject({ status: 404 });
   });
 });
 
@@ -245,12 +295,21 @@ describe("removeCartItem()", () => {
 // clearCart()
 // ══════════════════════════════════════════════════════════════
 describe("clearCart()", () => {
-  it("✅ hapus semua item di cart", async () => {
+  it("✅ hapus semua item di cart via deleteMany", async () => {
     mockCart.findUnique.mockResolvedValue(makeCart({ items: [makeItem()] }));
     mockCartItem.deleteMany.mockResolvedValue({ count: 1 });
 
     await clearCart("user-1");
 
     expect(mockCartItem.deleteMany).toHaveBeenCalledWith({ where: { cartId: "cart-1" } });
+  });
+
+  it("✅ cart kosong — deleteMany tetap dipanggil", async () => {
+    mockCart.findUnique.mockResolvedValue(makeCart({ items: [] }));
+    mockCartItem.deleteMany.mockResolvedValue({ count: 0 });
+
+    await clearCart("user-1");
+
+    expect(mockCartItem.deleteMany).toHaveBeenCalledOnce();
   });
 });

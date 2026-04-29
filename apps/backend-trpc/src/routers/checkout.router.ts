@@ -1,14 +1,12 @@
 import { z }                  from "zod";
-import { router, protectedProcedure, publicProcedure } from "../trpc/init";
+import { router, protectedProcedure } from "../trpc/init";
 import { serviceCall }        from "../trpc/errors";
 import { checkoutConfirmSchema } from "@ecommerce/shared";
 import * as checkoutService   from "../services/checkout.service";
 
 export const checkoutRouter = router({
 
-  // ── POST /checkout/calculate-summary ─────────────────────
-  // REST:  POST /checkout/calculate-summary body: { cartId, shippingMethod }
-  // tRPC:  trpc.checkout.calculateSummary.useMutation()
+  // FIX [Critical]: pass ctx.userId ke service supaya kepemilikan cart diverifikasi
   calculateSummary: protectedProcedure
     .input(
       z.object({
@@ -16,15 +14,12 @@ export const checkoutRouter = router({
         shippingMethod: z.enum(["regular", "express"]),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       return serviceCall(() =>
-        checkoutService.calculateCheckoutSummary(input.cartId, input.shippingMethod)
+        checkoutService.calculateCheckoutSummary(ctx.userId!, input.cartId, input.shippingMethod)
       );
     }),
 
-  // ── POST /checkout/confirm ────────────────────────────────
-  // REST:  POST /checkout/confirm body: checkoutConfirmSchema
-  // tRPC:  trpc.checkout.confirm.useMutation()
   confirm: protectedProcedure
     .input(checkoutConfirmSchema)
     .mutation(async ({ input, ctx }) => {
@@ -39,9 +34,6 @@ export const checkoutRouter = router({
       );
     }),
 
-  // ── GET /checkout/summary/:orderNumber ───────────────────
-  // REST:  GET /checkout/summary/:orderNumber
-  // tRPC:  trpc.checkout.getSummary.useQuery({ orderNumber })
   getSummary: protectedProcedure
     .input(z.object({ orderNumber: z.string().min(1) }))
     .query(async ({ input, ctx }) => {

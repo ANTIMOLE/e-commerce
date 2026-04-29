@@ -26,7 +26,8 @@ export const authRouter = router({
   // REST:  GET /auth/me → getMeController
   // tRPC:  trpc.auth.me.useQuery()
   me: protectedProcedure.query(async ({ ctx }) => {
-    return serviceCall(() => authService.getProfile(ctx.userId!));
+    const result = await serviceCall(() => authService.getProfile(ctx.userId!));
+    return result.user;
   }),
 
   // ── POST /auth/register ───────────────────────────────────

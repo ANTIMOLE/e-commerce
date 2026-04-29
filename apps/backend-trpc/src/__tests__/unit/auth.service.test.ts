@@ -243,16 +243,23 @@ describe("changePassword()", () => {
 // getProfile()
 // ══════════════════════════════════════════════════════════════
 describe("getProfile()", () => {
-  it("✅ return profil user tanpa passwordHash", async () => {
+  it("✅ return profil user dengan role + phone, tanpa passwordHash", async () => {
     const fakeUser = {
       id: "user-1", name: "Budi", email: "budi@test.com",
-      role: "USER", createdAt: new Date(),
+      role: "USER", phone: "081234567890",
+      createdAt: new Date(),
     };
     mockUser.findUnique.mockResolvedValue(fakeUser);
 
     const result = await getProfile("user-1");
 
     expect(result.user).toMatchObject({ id: "user-1", name: "Budi" });
+    // Parity dengan REST: role harus ada
+    expect(result.user).toHaveProperty("role");
+    expect(result.user.role).toBe("USER");
+    // Regression: phone harus ada
+    expect(result.user).toHaveProperty("phone");
+    expect(result.user.phone).toBe("081234567890");
     expect(result.user).not.toHaveProperty("passwordHash");
   });
 

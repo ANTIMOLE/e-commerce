@@ -3,12 +3,11 @@
  *
  * Letakkan di: backend-trpc/src/__tests__/unit/product.service.test.ts
  *
- * Menguji: getAll, getBySlug, getById, search
+ * Perubahan vs versi original:
+ *  - Tambah regression group: 0-valued filter (minPrice=0, maxPrice=0, minRating=0)
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-
-// ─── MOCK ─────────────────────────────────────────────────────
 
 vi.mock("../../config/database", () => ({
   prisma: {
@@ -21,19 +20,15 @@ vi.mock("../../config/database", () => ({
   },
 }));
 
-vi.mock("../../config/env", () => ({
-  env: { NODE_ENV: "test" },
-}));
+vi.mock("../../config/env", () => ({ env: { NODE_ENV: "test" } }));
 
-// ─── Import setelah mock ──────────────────────────────────────
-import { prisma }                         from "../../config/database";
+import { prisma }                              from "../../config/database";
 import { getAll, getBySlug, getById, search } from "../../services/product.service";
 
 const mockProduct = prisma.product as unknown as Record<string, ReturnType<typeof vi.fn>>;
 
 beforeEach(() => { vi.clearAllMocks(); });
 
-// ─── Data fixture ─────────────────────────────────────────────
 const fakeProduct = {
   id: "prod-1", name: "Sepatu Nike", slug: "sepatu-nike",
   price: 500000, images: [], rating: 4.5, soldCount: 100,
@@ -55,7 +50,7 @@ describe("getAll()", () => {
     expect(result.data).toHaveLength(1);
     expect(result.totalCount).toBe(25);
     expect(result.page).toBe(1);
-    expect(result.totalPages).toBe(2); // ceil(25/20)
+    expect(result.totalPages).toBe(2);         // ceil(25/20)
     expect(result.hasNextPage).toBe(true);
     expect(result.hasPrevPage).toBe(false);
   });
@@ -66,8 +61,8 @@ describe("getAll()", () => {
 
     await getAll({ categoryId: "cat-1" });
 
-    const whereArg = mockProduct.findMany.mock.calls[0][0].where;
-    expect(whereArg).toMatchObject({ categoryId: "cat-1", isActive: true });
+    const where = mockProduct.findMany.mock.calls[0][0].where;
+    expect(where).toMatchObject({ categoryId: "cat-1", isActive: true });
   });
 
   it("✅ filter by q (search keyword) diteruskan ke prisma where", async () => {
@@ -76,18 +71,18 @@ describe("getAll()", () => {
 
     await getAll({ q: "nike" });
 
-    const whereArg = mockProduct.findMany.mock.calls[0][0].where;
-    expect(whereArg.name).toMatchObject({ contains: "nike" });
+    const where = mockProduct.findMany.mock.calls[0][0].where;
+    expect(where.name).toMatchObject({ contains: "nike" });
   });
 
-  it("✅ filter by minPrice dan maxPrice", async () => {
+  it("✅ filter by minPrice dan maxPrice (nilai normal)", async () => {
     mockProduct.count.mockResolvedValue(2);
     mockProduct.findMany.mockResolvedValue([fakeProduct]);
 
     await getAll({ minPrice: 100000, maxPrice: 600000 });
 
-    const whereArg = mockProduct.findMany.mock.calls[0][0].where;
-    expect(whereArg.price).toMatchObject({ gte: 100000, lte: 600000 });
+    const where = mockProduct.findMany.mock.calls[0][0].where;
+    expect(where.price).toMatchObject({ gte: 100000, lte: 600000 });
   });
 
   it("✅ pagination: skip dihitung dari (page-1)*limit", async () => {
@@ -96,9 +91,9 @@ describe("getAll()", () => {
 
     await getAll({ page: 3, limit: 10 });
 
-    const findArg = mockProduct.findMany.mock.calls[0][0];
-    expect(findArg.skip).toBe(20); // (3-1)*10
-    expect(findArg.take).toBe(10);
+    const args = mockProduct.findMany.mock.calls[0][0];
+    expect(args.skip).toBe(20);   // (3-1)*10
+    expect(args.take).toBe(10);
   });
 
   it("✅ hasPrevPage true jika page > 1", async () => {
@@ -118,6 +113,64 @@ describe("getAll()", () => {
 
     expect(mockProduct.count.mock.calls[0][0].where).toMatchObject({ isActive: true });
     expect(mockProduct.findMany.mock.calls[0][0].where).toMatchObject({ isActive: true });
+  });
+
+  // ── Regression: 0-valued filter ───────────────────────────────
+  // Bug: `...(minPrice && { price: { gte: minPrice } })` skip nilai 0 karena falsy.
+  // Fix yang benar: `minPrice !== undefined` atau `minPrice != null`.
+
+  it("🔴 regression: minPrice=0 harus menghasilkan filter gte:0, BUKAN di-skip", async () => {
+    mockProduct.count.mockResolvedValue(5);
+    mockProduct.findMany.mockResolvedValue([]);
+
+    await getAll({ minPrice: 0 });
+
+    const where = mockProduct.findMany.mock.calls[0][0].where;
+    // Jika pakai truthy check → price tidak ada di where → test MERAH
+    expect(where).toHaveProperty("price");
+    expect(where.price).toMatchObject({ gte: 0 });
+  });
+
+  it("🔴 regression: maxPrice=0 harus menghasilkan filter lte:0, BUKAN di-skip", async () => {
+    mockProduct.count.mockResolvedValue(0);
+    mockProduct.findMany.mockResolvedValue([]);
+
+    await getAll({ maxPrice: 0 });
+
+    const where = mockProduct.findMany.mock.calls[0][0].where;
+    expect(where).toHaveProperty("price");
+    expect(where.price).toMatchObject({ lte: 0 });
+  });
+
+  it("🔴 regression: minPrice=0 dan maxPrice=0 — keduanya aktif sekaligus", async () => {
+    mockProduct.count.mockResolvedValue(0);
+    mockProduct.findMany.mockResolvedValue([]);
+
+    await getAll({ minPrice: 0, maxPrice: 0 });
+
+    const where = mockProduct.findMany.mock.calls[0][0].where;
+    expect(where.price).toMatchObject({ gte: 0, lte: 0 });
+  });
+
+  it("🔴 regression: minRating=0 harus menghasilkan filter rating gte:0, BUKAN di-skip", async () => {
+    mockProduct.count.mockResolvedValue(5);
+    mockProduct.findMany.mockResolvedValue([]);
+
+    await getAll({ minRating: 0 });
+
+    const where = mockProduct.findMany.mock.calls[0][0].where;
+    expect(where).toHaveProperty("rating");
+    expect(where.rating).toMatchObject({ gte: 0 });
+  });
+
+  it("✅ minRating normal (>0) tetap berfungsi setelah fix", async () => {
+    mockProduct.count.mockResolvedValue(3);
+    mockProduct.findMany.mockResolvedValue([]);
+
+    await getAll({ minRating: 3.5 });
+
+    const where = mockProduct.findMany.mock.calls[0][0].where;
+    expect(where.rating).toMatchObject({ gte: 3.5 });
   });
 });
 
@@ -149,8 +202,8 @@ describe("getBySlug()", () => {
 
     await expect(getBySlug("produk-inactive")).rejects.toMatchObject({ status: 404 });
 
-    const whereArg = mockProduct.findFirst.mock.calls[0][0].where;
-    expect(whereArg.isActive).toBe(true);
+    const where = mockProduct.findFirst.mock.calls[0][0].where;
+    expect(where.isActive).toBe(true);
   });
 });
 
@@ -183,18 +236,18 @@ describe("search()", () => {
 
     await search("nike");
 
-    const whereArg = mockProduct.findMany.mock.calls[0][0].where;
-    expect(whereArg.name).toMatchObject({ contains: "nike" });
+    const where = mockProduct.findMany.mock.calls[0][0].where;
+    expect(where.name).toMatchObject({ contains: "nike" });
   });
 
-  it("✅ search bisa dikombinasikan dengan options tambahan (page, limit)", async () => {
+  it("✅ search + pagination options berfungsi", async () => {
     mockProduct.count.mockResolvedValue(5);
     mockProduct.findMany.mockResolvedValue([]);
 
     await search("adidas", { page: 2, limit: 5 });
 
-    const findArg = mockProduct.findMany.mock.calls[0][0];
-    expect(findArg.skip).toBe(5); // (2-1)*5
-    expect(findArg.take).toBe(5);
+    const args = mockProduct.findMany.mock.calls[0][0];
+    expect(args.skip).toBe(5);   // (2-1)*5
+    expect(args.take).toBe(5);
   });
 });

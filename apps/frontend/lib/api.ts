@@ -38,6 +38,22 @@ api.interceptors.response.use(
     const originalRequest = error.config as typeof error.config & { _retry?: boolean };
 
     if (error.response?.status === 401 && !originalRequest?._retry) {
+      // FIX [High]: kalau request yang gagal adalah /auth/refresh itu sendiri,
+      // jangan masukkan ke queue — itu akan bikin promise tidak pernah resolve
+      // karena isRefreshing sudah true dan tidak ada yang menyelesaikannya.
+      // Langsung drain queue dengan error, reset flag, lalu redirect ke login.
+      const isRefreshRequest =
+        originalRequest?.url?.includes("/auth/refresh") ?? false;
+
+      if (isRefreshRequest) {
+        processQueue(error);
+        isRefreshing = false;
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
+        }
+        return Promise.reject(error);
+      }
+
       if (isRefreshing) {
         // Queue request lain yang masuk saat sedang refresh
         return new Promise((resolve, reject) => {

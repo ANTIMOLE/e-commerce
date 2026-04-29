@@ -118,20 +118,26 @@ export async function getProfileController(
   res: Response,
   next: NextFunction
 ) {
-  // TODO: implementasi di sini
   try{
     const userId = req.user!.id;
-    const profile = await authService.getProfile(userId);
+    // FIX: authService.getProfile() return { user, message }.
+    // Sebelumnya: data: profile → data = { user: {...}, message: "..." } → d.id = undefined.
+    // getMeController sudah benar karena destructure { user }.
+    // Sekarang /auth/profile dan /auth/me return shape yang identik.
+    const { user } = await authService.getProfile(userId);
 
-    res.json({ success: true, data: profile });
+    res.json({ success: true, data: user });
   }catch(error){
     next(error);
   }
 }
 
 // auth.controller.ts
-export async function getMeController(req: AuthRequest, res: Response) {
-  res.json({ success: true, data: req.user });
+export async function getMeController(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    const { user } = await authService.getProfile(req.user!.id);
+    res.json({ success: true, data: user });
+  } catch (error) { next(error); }
 }
 
 export async function refreshTokenController(req: Request, res: Response, next: NextFunction) {

@@ -1,7 +1,7 @@
 import { Router, IRouter } from "express";
 import { validate } from "../middlewares/validate.middleware";
 import { authenticate } from "../middlewares/auth.middleware";
-import { orderItemSchema,  orderCreateSchema} from "@ecommerce/shared";
+import { z } from "zod";
 import {
     getOrdersController,
     getOrderByIdController,
@@ -11,21 +11,19 @@ import {
     deliverOrderController
 } from "../controllers/order.controller";
 
-
 export const orderRoutes: IRouter = Router();
 
-//PROTECTED ROUTES - harus login dulu
+// FIX: Validasi params :orderId sebagai UUID sebelum masuk controller.
+// Tanpa ini, GET /orders/bukan-uuid langsung ke service → findFirst miss → 404.
+// Test rest.test.ts line 652 expect 400 — contract yang benar karena "bukan-uuid"
+// bukan ID yang valid secara format, bukan sekadar "tidak ditemukan".
+const orderIdParamsSchema = z.object({
+    orderId: z.string().uuid("orderId harus berformat UUID"),
+});
 
-//CONTOH
-//PROTECTED ROUTES - harus login dulu
-
-// checkoutRoutes.get("/summary/:orderNumber", authenticate, getCheckoutSummaryController);
-// checkoutRoutes.post("/calculate-summary", validate(cartItemIdSchema),calculateCheckoutSummaryController);
-// checkoutRoutes.post("/confirm", authenticate, validate(checkoutConfirmSchema), confirmCheckoutController);
-
-orderRoutes.get("/", authenticate, validate(orderItemSchema), getOrdersController);
-orderRoutes.get("/:orderId", authenticate, getOrderByIdController);
-orderRoutes.post("/:orderId/cancel", authenticate, cancelOrderController);
-orderRoutes.post("/:orderId/confirm", authenticate, confirmOrderController);
-orderRoutes.post("/:orderId/ship", authenticate, shipOrderController);
-orderRoutes.post("/:orderId/deliver", authenticate, deliverOrderController);
+orderRoutes.get("/",                  authenticate, getOrdersController);
+orderRoutes.get("/:orderId",          authenticate, validate(orderIdParamsSchema, "params"), getOrderByIdController);
+orderRoutes.post("/:orderId/cancel",  authenticate, validate(orderIdParamsSchema, "params"), cancelOrderController);
+orderRoutes.post("/:orderId/confirm", authenticate, validate(orderIdParamsSchema, "params"), confirmOrderController);
+orderRoutes.post("/:orderId/ship",    authenticate, validate(orderIdParamsSchema, "params"), shipOrderController);
+orderRoutes.post("/:orderId/deliver", authenticate, validate(orderIdParamsSchema, "params"), deliverOrderController);

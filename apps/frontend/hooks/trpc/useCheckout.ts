@@ -1,32 +1,30 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
-import { trpc }           from "@/lib/trpc";
-import { queryKeys }      from "@/lib/queryClient";
-import { toast }          from "sonner";
+import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
 
-// ── useAddresses ───────────────────────────────────────────────
 export function useAddresses() {
   return trpc.profile.getAddresses.useQuery(undefined, {
     staleTime: 5 * 60_000,
   });
 }
 
-// ── useCheckout ────────────────────────────────────────────────
 export function useCheckout() {
-  const qc = useQueryClient();
+  const utils = trpc.useUtils();
 
   const confirmMutation = trpc.checkout.confirm.useMutation({
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: queryKeys.cart.all });
-      void qc.invalidateQueries({ queryKey: queryKeys.orders.all });
+      // FIX [High]: invalidate cart dan orders via tRPC utils, bukan queryKeys.*
+      void utils.cart.get.invalidate();
+      void utils.order.getAll.invalidate();
     },
     onError: (err: { message: string }) => toast.error(err.message),
   });
 
   const createAddressMutation = trpc.profile.addAddress.useMutation({
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: queryKeys.profile.addresses() });
+      // FIX [High]: invalidate via utils.profile.getAddresses
+      void utils.profile.getAddresses.invalidate();
       toast.success("Alamat berhasil disimpan");
     },
     onError: (err: { message: string }) => toast.error(err.message),

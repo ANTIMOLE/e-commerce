@@ -79,7 +79,7 @@ export default function CartPage() {
           <div className="flex-1 space-y-4">
             {[1, 2, 3].map(i => (
               <div key={i} className="bg-white rounded-2xl border p-4 flex gap-4">
-                <Skeleton className="w-20 h-20 rounded-xl flex-shrink-0" />
+                <Skeleton className="w-20 h-20 rounded-xl shrink-0" />
                 <div className="flex-1 space-y-2">
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-5 w-1/3" />
@@ -128,7 +128,7 @@ export default function CartPage() {
             return (
               <div key={item.id} className="bg-white rounded-2xl border shadow-sm p-4 flex gap-4">
                 {/* Gambar */}
-                <Link href={ROUTES.PRODUCT_DETAIL(item.product.slug)} className="flex-shrink-0">
+                <Link href={ROUTES.PRODUCT_DETAIL(item.product.slug)} className="shrink-0">
                   <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-gray-50 border">
                     <Image
                       src={imgUrl}
@@ -188,7 +188,7 @@ export default function CartPage() {
                 </div>
 
                 {/* Subtotal per item */}
-                <div className="flex-shrink-0 text-right">
+                <div className="shrink-0 text-right">
                   <p className="text-sm font-semibold text-gray-800">
                     {formatPrice(Number(item.priceAtTime) * item.quantity)}
                   </p>
@@ -199,7 +199,7 @@ export default function CartPage() {
         </div>
 
         {/* ── Ringkasan Order ───────────────────────────────── */}
-        <div className="w-full lg:w-72 flex-shrink-0">
+        <div className="w-full lg:w-72 shrink-0">
           <div className="bg-white rounded-2xl border shadow-sm p-5 sticky top-20">
             <h2 className="font-semibold text-base mb-4">Ringkasan Belanja</h2>
             <div className="space-y-2.5 text-sm">

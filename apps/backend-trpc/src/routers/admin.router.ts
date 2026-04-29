@@ -27,7 +27,7 @@ export const adminRouter = router({
         page:       z.number().int().min(1).default(1),
         limit:      z.number().int().min(1).max(100).default(20),
         q:          z.string().optional(),
-        categoryId: z.string().uuid().optional(),
+        categoryId: z.string().min(1).optional(),
         isActive:   z.boolean().optional(),
       }).optional()
     )
@@ -41,7 +41,10 @@ export const adminRouter = router({
   createProduct: adminProcedure
     .input(
       z.object({
-        categoryId:  z.string().uuid(),
+        // FIX: categoryId dari seed berbentuk "cat_xxx" (bukan UUID murni).
+        // z.string().uuid() menolak format ini → 400 padahal data valid.
+        // Ganti ke z.string().min(1) agar konsisten dengan format ID kategori di DB.
+        categoryId:  z.string().min(1, "categoryId wajib diisi"),
         name:        z.string().min(1).max(500),
         description: z.string().optional(),
         price:       z.number().positive(),
@@ -68,7 +71,8 @@ export const adminRouter = router({
         images:      z.array(z.string()).optional(),
         discount:    z.number().int().min(0).max(100).optional(),
         isActive:    z.boolean().optional(),
-        categoryId:  z.string().uuid().optional(),
+        // FIX: sama dengan createProduct, categoryId bukan UUID murni
+        categoryId:  z.string().min(1).optional(),
       })
     )
     .mutation(async ({ input }) => {

@@ -1,9 +1,7 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
-import { trpc }           from "@/lib/trpc";
-import { queryKeys }      from "@/lib/queryClient";
-import { toast }          from "sonner";
+import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
 
 // Re-use type definitions from REST hook (same shape, same backend service)
 // Only re-export *types*, not the conflicting interface declarations
@@ -16,16 +14,6 @@ export type {
   AdminUser,
   adminKeys,
 } from "../rest/useAdmin";
-
-// ── query key helpers ─────────────────────────────────────────
-// Keep local to avoid re-export conflicts with rest/useAdmin
-const adminQueryKeys = {
-  all:       ["admin"] as const,
-  dashboard: () => ["admin", "dashboard"] as const,
-  products:  (params?: object) => ["admin", "products", params ?? {}] as const,
-  orders:    (params?: object) => ["admin", "orders",   params ?? {}] as const,
-  users:     (params?: object) => ["admin", "users",    params ?? {}] as const,
-};
 
 // ── param interfaces (local, no conflict) ─────────────────────
 interface ProductParams {
@@ -60,11 +48,13 @@ export function useAdminProducts(params: ProductParams = {}) {
 }
 
 export function useCreateProduct() {
-  const qc = useQueryClient();
+  const utils = trpc.useUtils();
   return trpc.admin.createProduct.useMutation({
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: adminQueryKeys.all });
-      qc.invalidateQueries({ queryKey: queryKeys.products.all });
+      // FIX [High]: invalidate via tRPC utils, bukan qc.invalidateQueries(adminQueryKeys/queryKeys)
+      void utils.admin.getProducts.invalidate();
+      // invalidate public product cache juga supaya storefront ikut segar
+      void utils.product.getAll.invalidate();
       toast.success("Produk berhasil dibuat");
     },
     onError: (err) => toast.error(err.message),
@@ -72,11 +62,12 @@ export function useCreateProduct() {
 }
 
 export function useUpdateProduct() {
-  const qc = useQueryClient();
+  const utils = trpc.useUtils();
   return trpc.admin.updateProduct.useMutation({
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: adminQueryKeys.all });
-      qc.invalidateQueries({ queryKey: queryKeys.products.all });
+      // FIX [High]: sama — utils tRPC
+      void utils.admin.getProducts.invalidate();
+      void utils.product.getAll.invalidate();
       toast.success("Produk berhasil diperbarui");
     },
     onError: (err) => toast.error(err.message),
@@ -84,11 +75,12 @@ export function useUpdateProduct() {
 }
 
 export function useDeleteProduct() {
-  const qc = useQueryClient();
+  const utils = trpc.useUtils();
   return trpc.admin.deleteProduct.useMutation({
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: adminQueryKeys.all });
-      qc.invalidateQueries({ queryKey: queryKeys.products.all });
+      // FIX [High]: sama — utils tRPC
+      void utils.admin.getProducts.invalidate();
+      void utils.product.getAll.invalidate();
       toast.success("Produk dinonaktifkan");
     },
     onError: (err) => toast.error(err.message),
@@ -104,7 +96,6 @@ export function useAdminOrders(params: OrderParams = {}) {
       page:   params.page,
       limit:  params.limit,
       q:      params.q,
-      // cast status: router validates it as enum, we pass string from UI
       status: params.status as
         | "pending_payment" | "confirmed" | "processing"
         | "shipped" | "delivered" | "cancelled"
@@ -115,11 +106,12 @@ export function useAdminOrders(params: OrderParams = {}) {
 }
 
 export function useUpdateOrderStatus() {
-  const qc = useQueryClient();
+  const utils = trpc.useUtils();
   return trpc.admin.updateOrderStatus.useMutation({
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: adminQueryKeys.all });
-      qc.invalidateQueries({ queryKey: queryKeys.orders.all });
+      // FIX [High]: invalidate admin orders dan user-facing orders via utils tRPC
+      void utils.admin.getOrders.invalidate();
+      void utils.order.getAll.invalidate();
       toast.success("Status pesanan diperbarui");
     },
     onError: (err) => toast.error(err.message),

@@ -86,12 +86,12 @@ const mockAdminUser = {
 };
 
 // Typed convenience refs
-const mockPrismaUser = prisma.user as {
+const mockPrismaUser = prisma.user  as unknown as  {
   findUnique: ReturnType<typeof vi.fn>;
   create: ReturnType<typeof vi.fn>;
   update: ReturnType<typeof vi.fn>;
 };
-const mockPrismaRefreshToken = prisma.refreshToken as {
+const mockPrismaRefreshToken = prisma.refreshToken as unknown as {
   create: ReturnType<typeof vi.fn>;
   findMany: ReturnType<typeof vi.fn>;
   updateMany: ReturnType<typeof vi.fn>;
@@ -411,21 +411,26 @@ describe("authService.changePassword()", () => {
 });
 
 // ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 // 6. getProfile()
 // ══════════════════════════════════════════════════════════════
 describe("authService.getProfile()", () => {
-  it("✅ mengembalikan data user tanpa passwordHash", async () => {
+  it("✅ mengembalikan data user dengan phone, tanpa passwordHash", async () => {
     mockPrismaUser.findUnique.mockResolvedValue({
       id: "user-uuid-123",
       name: "Test User",
       email: "test@example.com",
       role: "USER",
+      phone: "081234567890",   // regression: phone harus ada di select
       createdAt: new Date(),
     });
 
     const result = await authService.getProfile("user-uuid-123");
 
     expect(result.user).toMatchObject({ id: "user-uuid-123", role: "USER" });
+    // Regression: phone harus ada di response (pernah hilang dari select)
+    expect(result.user).toHaveProperty("phone");
+    expect(result.user.phone).toBe("081234567890");
     // Field sensitif tidak boleh ada
     expect(result.user).not.toHaveProperty("passwordHash");
   });

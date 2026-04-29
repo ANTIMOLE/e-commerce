@@ -38,7 +38,7 @@ function computeCartSummary(cart: RawCart | null | undefined) {
   const subtotal = cart.items.reduce(
     (sum, item) => sum + Number(item.priceAtTime) * item.quantity, 0
   );
-  const tax   = Math.round(subtotal * 0.1);
+  const tax   = Math.round(subtotal * 0.11);
   const total = subtotal + tax;
   return { subtotal, tax, total, itemCount: cart.items.length };
 }
@@ -63,8 +63,12 @@ export function useCart() {
   const isEmpty   = !typedCart || typedCart.items.length === 0;
   const isLoading = isLoadingCart || authLoading;
 
+  // ganti di dalam useCart():
+  const utils = trpc.useUtils();
+
+  // FIX [High]: invalidate cache key tRPC cart.get, bukan queryKeys.cart.all (REST key)
   function invalidateCart() {
-    void qc.invalidateQueries({ queryKey: queryKeys.cart.all });
+    void utils.cart.get.invalidate();
   }
 
   const { mutateAsync: addItem, isPending: isAddingItem } =

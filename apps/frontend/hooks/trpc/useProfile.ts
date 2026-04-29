@@ -1,13 +1,10 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
-import { trpc }           from "@/lib/trpc";
-import { queryKeys }      from "@/lib/queryClient";
-import { toast }          from "sonner";
+import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
 
-// ── useProfile ─────────────────────────────────────────────────
 export function useProfile() {
-  const qc = useQueryClient();
+  const utils = trpc.useUtils();
 
   const { data: profile, isLoading, isError } = trpc.profile.get.useQuery(
     undefined,
@@ -17,8 +14,9 @@ export function useProfile() {
   const { mutateAsync: updateProfile, isPending: isUpdating } =
     trpc.profile.update.useMutation({
       onSuccess: (updated) => {
-        qc.setQueryData(queryKeys.profile.me(), updated);
-        void qc.invalidateQueries({ queryKey: queryKeys.auth.me });
+        // FIX [High]: setData ke cache tRPC yang benar; invalidate auth.me juga via utils
+        utils.profile.get.setData(undefined, updated);
+        void utils.auth.me.invalidate();
         toast.success("Profil berhasil diperbarui");
       },
       onError: (err: { message: string }) => toast.error(err.message),
@@ -27,17 +25,17 @@ export function useProfile() {
   return { profile, isLoading, isError, updateProfile, isUpdating };
 }
 
-// ── useAddressManager ──────────────────────────────────────────
 export function useAddressManager() {
-  const qc = useQueryClient();
+  const utils = trpc.useUtils();
 
   const { data: addresses, isLoading } = trpc.profile.getAddresses.useQuery(
     undefined,
     { staleTime: 5 * 60_000 }
   );
 
+  // FIX [High]: invalidate via utils.profile.getAddresses, bukan queryKeys.profile.addresses()
   function invalidate() {
-    void qc.invalidateQueries({ queryKey: queryKeys.profile.addresses() });
+    void utils.profile.getAddresses.invalidate();
   }
 
   const { mutateAsync: addAddress, isPending: isAdding } =

@@ -200,6 +200,8 @@ export async function getProfile(userId: string) {
       id:        true,
       name:      true,
       email:     true,
+      // FIX [High]: tambah phone — sebelumnya tidak di-select sehingga tampil kosong di UI profil
+      phone:     true,
       role:      true,
       createdAt: true,
     },

@@ -41,7 +41,18 @@ export async function getOrders(userId: string, query: any) {
             }
         }
     });
-    return { orders, total };
+    // FIX: Normalize Prisma Decimal ke number sebelum return
+    const normalized = orders.map((order) => ({
+        ...order,
+        total: Number(order.total),
+        items: order.items.map((item) => ({
+            ...item,
+            unitPrice: Number(item.unitPrice),
+            subtotal:  Number(item.subtotal),
+        })),
+    }));
+
+    return { orders: normalized, total };
 }
 
 //getOrderById(userId, orderId) — detail satu order + items
@@ -86,7 +97,19 @@ export async function getOrderById(userId: string, orderId: string) {
         throw new AppError("Order tidak ditemukan.", 404);
     }
 
-    return order;
+    // FIX: Normalize Prisma Decimal ke number
+    return {
+        ...order,
+        subtotal:     Number(order.subtotal),
+        tax:          Number(order.tax),
+        shippingCost: Number(order.shippingCost),
+        total:        Number(order.total),
+        items: order.items.map((item) => ({
+            ...item,
+            unitPrice: Number(item.unitPrice),
+            subtotal:  Number(item.subtotal),
+        })),
+    };
 }
 
 

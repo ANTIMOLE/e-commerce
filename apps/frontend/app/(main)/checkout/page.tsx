@@ -271,7 +271,8 @@ export default function CheckoutPage() {
                 <span>{formatPrice(subtotal)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">PPN 10%</span>
+                {/* FIX [Medium]: TAX_RATE di constants.ts dan useCart sudah 0.11 (11%); label harus sinkron */}
+                <span className="text-gray-500">PPN 11%</span>
                 <span>{formatPrice(tax)}</span>
               </div>
               <div className="flex justify-between">
