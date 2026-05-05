@@ -18,11 +18,14 @@ export interface ApiResponse<T> {
   error?:  string;
 }
 
+export type UserRole = "USER" | "ADMIN";
+
 export interface User {
   id:        string;
   name:      string;
   email:     string;
   phone?:    string;
+  role:      UserRole;   // [FIX] tambah role — dibutuhkan admin layout guard
   createdAt: string;
 }
 
@@ -193,6 +196,17 @@ export interface OrderItem {
   subtotal:     number;
 }
 
+// [FIX] shippingAddress bukan Address entity — ini JSON snapshot yang disimpan
+// saat order dibuat. Tidak punya id/userId/isDefault karena bukan row tabel Address.
+export interface OrderShippingAddressSnapshot {
+  recipientName: string;
+  phone:         string;
+  address:       string;
+  city:          string;
+  province:      string;
+  zipCode:       string;
+}
+
 export interface Order {
   id:              string;
   userId:          string;
@@ -202,7 +216,7 @@ export interface Order {
   tax:             number;
   shippingCost:    number;
   total:           number;
-  shippingAddress: Address;
+  shippingAddress: OrderShippingAddressSnapshot;
   paymentMethod:   PaymentMethodCode;
   shippingMethod:  ShippingMethodCode;
   items:           OrderItem[];

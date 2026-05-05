@@ -30,10 +30,15 @@ export interface ProductQueryParams extends PaginationParams {
 }
 
 // ── Auth ──────────────────────────────────────────────────────
+// [FIX] email dan role dibuat optional:
+// - access token REST: { userId, role }  (tidak ada email)
+// - refresh token REST: { userId }        (tidak ada email, tidak ada role)
+// Sebelumnya email required padahal tidak pernah dimasukkan ke token.
+// tRPC context membaca decoded.email → TypeScript happy tapi runtime undefined.
 export interface JwtPayload {
   userId: string;
-  email:  string;
-  role:   "USER" | "ADMIN";  // ← added
+  email?: string;            // tidak ada di token REST (backend sign langsung tanpa helper shared)
+  role?:  "USER" | "ADMIN"; // ada di access token, tidak ada di refresh token
   iat?:   number;
   exp?:   number;
 }

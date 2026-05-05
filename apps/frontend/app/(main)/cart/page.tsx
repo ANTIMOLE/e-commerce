@@ -11,47 +11,20 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice, getImageUrl } from "@/lib/utils";
-import { ROUTES } from "@/lib/constants";
-import type { Cart } from "@/types";
+import { PLACEHOLDER_IMAGE, ROUTES } from "@/lib/constants";
 
-// ─────────────────────────────────────────────────────────────
-// HOOKS YANG DIBUTUHKAN (belum ada, buat setelah UI selesai):
-//
-//   useCart()  →  hooks/rest/useCart.ts
-//     - cart           : Cart | undefined
-//     - isLoading      : boolean
-//     - isEmpty        : boolean
-//     - subtotal       : number
-//     - tax            : number
-//     - total          : number
-//     - updateItem(cartItemId, quantity)   : void
-//     - removeItem(cartItemId)             : void
-//     - isUpdatingItem : boolean
-//     - isRemovingItem : boolean
-//
-//   Endpoints yang dibutuhkan:
-//     GET    /cart
-//     PATCH  /cart/items/:cartItemId   { quantity }
-//     DELETE /cart/items/:cartItemId
-// ─────────────────────────────────────────────────────────────
 
 export default function CartPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: loadingAuth } = useAuth();
 
-  // TODO: ganti ini dengan: const { cart, isLoading, isEmpty, ... } = useCart();
-  // const isLoading      = false;
   const { cart, isLoading, isEmpty, subtotal, tax, total,
         updateItem, removeItem, clearCart, isMutating } = useCart();
 
-//   const subtotal       = 0;
-//   const tax            = 0;
-//   const total          = 0;
-
-  const isUpdatingItem = false;
-  const isRemovingItem = false;
-//   const updateItem     = (_id: string, _qty: number) => {};
-//   const removeItem     = (_id: string) => {};
+  // [FIX] Pakai isMutating asli — bukan hardcode false.
+  // Tombol qty/hapus di-disable saat request sedang berjalan, cegah double-click race.
+  const isUpdatingItem = isMutating;
+  const isRemovingItem = isMutating;
 
 //   const isEmpty        = true as boolean;       // hindari literal narrowing
 // const cart           = null as unknown as Cart;
@@ -136,6 +109,9 @@ export default function CartPage() {
                       fill
                       className="object-cover"
                       sizes="80px"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+                      }}
                     />
                   </div>
                 </Link>
@@ -210,7 +186,7 @@ export default function CartPage() {
                 <span className="font-medium">{formatPrice(subtotal)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">PPN 10%</span>
+                <span className="text-gray-500">PPN 11%</span>
                 <span className="font-medium">{formatPrice(tax)}</span>
               </div>
               <div className="flex justify-between text-xs text-gray-400">

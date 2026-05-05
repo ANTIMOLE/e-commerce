@@ -8,6 +8,7 @@ import {
   changePasswordSchema,
 } from "@ecommerce/shared";
 import * as authService from "../services/auth.service";
+import type { Request } from "express";
 
 // Cookie config — mirrors REST (auth.service.ts COOKIE_OPTIONS)
 const COOKIE_BASE = {
@@ -71,7 +72,8 @@ export const authRouter = router({
   refresh: publicProcedure
     .mutation(async ({ ctx }) => {
       // ctx sudah expose res, akses req via res.req (Express pattern)
-      const token = (ctx.res as any).req?.cookies?.refreshToken;
+      const req = ctx.res.req as Request;
+      const token = req.cookies?.refreshToken as string | undefined;
       if (!token) {
         throw new TRPCError({ code: "UNAUTHORIZED", message: "Refresh token tidak ditemukan." });
       }

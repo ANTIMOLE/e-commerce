@@ -8,7 +8,8 @@
     "dev": "tsc --watch",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:seed": "ts-node --project tsconfig.json prisma/seed.ts",
+    "db:seed:products": "tsx src/seeds/seed_barang_final.ts",
+    "db:seed:history":  "tsx src/seeds/seed_history.ts",
     "db:reset": "prisma migrate reset --force",
     "db:studio": "prisma studio"
   },

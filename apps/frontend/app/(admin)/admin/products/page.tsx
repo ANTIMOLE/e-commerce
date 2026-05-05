@@ -64,6 +64,33 @@ function productToForm(p: AdminProduct): ProductForm {
 }
 
 // ── Page ───────────────────────────────────────────────────────
+
+// ── AdminProductThumb ─────────────────────────────────────────
+// Komponen kecil yang kelola fallback gambar via React state.
+// React-safe: tidak mutasi DOM, tidak pakai innerHTML.
+function AdminProductThumb({ src, alt }: { src?: string; alt: string }) {
+  const [imgSrc, setImgSrc] = useState<string | undefined>(src);
+  if (!imgSrc) {
+    return (
+      <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden shrink-0 flex items-center justify-center text-gray-300 text-lg">
+        📷
+      </div>
+    );
+  }
+  return (
+    <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden shrink-0">
+      <img
+        src={imgSrc}
+        alt={alt}
+        width={40}
+        height={40}
+        className="w-full h-full object-cover"
+        onError={() => setImgSrc(undefined)}
+      />
+    </div>
+  );
+}
+
 export default function AdminProductsPage() {
   const [page,         setPage]         = useState(1);
   const [qInput,       setQInput]       = useState("");
@@ -215,16 +242,8 @@ export default function AdminProductsPage() {
               >
                 {/* Produk */}
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
-                    {product.images?.[0] ? (
-                      <Image
-                        src={getImageUrl(product.images[0])} alt={product.name}
-                        width={40} height={40} className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-300 text-lg">📷</div>
-                    )}
-                  </div>
+                  {/* [FIX] AdminProductThumb kelola fallback via React state — tidak mutasi DOM */}
+                  <AdminProductThumb src={product.images?.[0]} alt={product.name} />
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-gray-800 truncate">{product.name}</p>
                     {product.discount > 0 && (

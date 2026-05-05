@@ -1,20 +1,20 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { use } from "react";
-import Link from "next/link";
+// import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft, Package, MapPin, CreditCard,
   Truck, CheckCircle2, XCircle, Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useOrderDetail, useCancelOrder } from "@/hooks/useOrders";
 import { formatPrice, formatDateTime, getImageUrl } from "@/lib/utils";
+import type { OrderShippingAddressSnapshot } from "@/types";
 import { ORDER_STATUS_LABEL, ORDER_STATUS_COLOR, ROUTES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -82,8 +82,9 @@ export default function OrderDetailPage({ params }: Props) {
     );
   }
 
-  const canCancel    = order.status === "pending_payment";
-  const shippingAddr = order.shippingAddress as any;
+  const canCancel = order.status === "pending_payment";
+  // [FIX] Tidak perlu as any — Order.shippingAddress sekarang bertipe OrderShippingAddressSnapshot
+  const shippingAddr: OrderShippingAddressSnapshot = order.shippingAddress;
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-4">
@@ -104,7 +105,7 @@ export default function OrderDetailPage({ params }: Props) {
             <p className="font-mono font-bold text-gray-900">{order.orderNumber}</p>
           </div>
           <span className={cn(
-            "text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0",
+            "text-xs font-semibold px-2.5 py-1 rounded-full shrink-0",
             ORDER_STATUS_COLOR[order.status]
           )}>
             <StatusIcon status={order.status} />
@@ -141,11 +142,13 @@ export default function OrderDetailPage({ params }: Props) {
         <div className="divide-y">
           {order.items.map(item => (
             <div key={item.id} className="flex items-center gap-3 p-4">
-              <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+              <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-100 shrink-0">
+                {/* [FIX] Tambah onError fallback ke placeholder setelah getImageUrl() fix */}
                 <img
                   src={getImageUrl(item.productImage)}
                   alt={item.productName}
                   className="w-full h-full object-cover"
+                  onError={(e) => { e.currentTarget.src = "/images/placeholder-product.png"; }}
                 />
               </div>
               <div className="flex-1 min-w-0">
@@ -156,7 +159,7 @@ export default function OrderDetailPage({ params }: Props) {
                   {item.quantity} × {formatPrice(item.unitPrice)}
                 </p>
               </div>
-              <p className="text-sm font-semibold text-gray-800 flex-shrink-0">
+              <p className="text-sm font-semibold text-gray-800 shrink-0">
                 {formatPrice(item.subtotal)}
               </p>
             </div>
@@ -172,7 +175,7 @@ export default function OrderDetailPage({ params }: Props) {
           <span>{formatPrice(order.subtotal)}</span>
         </div>
         <div className="flex justify-between text-gray-600">
-          <span>Pajak (10%)</span>
+          <span>PPN (11%)</span>
           <span>{formatPrice(order.tax)}</span>
         </div>
         <div className="flex justify-between text-gray-600">

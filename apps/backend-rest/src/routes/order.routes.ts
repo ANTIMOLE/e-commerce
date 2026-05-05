@@ -10,6 +10,7 @@ import {
     shipOrderController,
     deliverOrderController
 } from "../controllers/order.controller";
+import { requireAdmin } from "../middlewares/role.middleware";
 
 export const orderRoutes: IRouter = Router();
 
@@ -25,5 +26,5 @@ orderRoutes.get("/",                  authenticate, getOrdersController);
 orderRoutes.get("/:orderId",          authenticate, validate(orderIdParamsSchema, "params"), getOrderByIdController);
 orderRoutes.post("/:orderId/cancel",  authenticate, validate(orderIdParamsSchema, "params"), cancelOrderController);
 orderRoutes.post("/:orderId/confirm", authenticate, validate(orderIdParamsSchema, "params"), confirmOrderController);
-orderRoutes.post("/:orderId/ship",    authenticate, validate(orderIdParamsSchema, "params"), shipOrderController);
-orderRoutes.post("/:orderId/deliver", authenticate, validate(orderIdParamsSchema, "params"), deliverOrderController);
+orderRoutes.post("/:orderId/ship",    authenticate, requireAdmin, validate(orderIdParamsSchema, "params"), shipOrderController);
+orderRoutes.post("/:orderId/deliver", authenticate, requireAdmin, validate(orderIdParamsSchema, "params"), deliverOrderController);

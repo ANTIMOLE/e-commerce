@@ -1,604 +1,291 @@
 // =============================================================
-// auth.js — Login helpers + user pool (500 real users)
+// s04_auth.js — Skenario S-04: Authentication Flow
 //
-// Letakkan di: k6-performance/auth.js (flat, tanpa subfolder helpers)
+// FIX B-01: File ini sebelumnya adalah duplikat identik dari auth.js
+// (helper saja, tidak ada export default / options).
+// File ini sekarang adalah skenario k6 yang valid dan bisa dijalankan.
 //
-// TEST_USERS diisi dari users_seed.csv: 500 user non-admin
-// Password semua: Password123!
-// Cukup untuk load test (200 VU) dengan 1 user unik per VU.
+// FIX REPEATABILITY: Register endpoint TIDAK dimasukkan ke dalam load loop.
+// Register membuat user permanen di DB (bcrypt, INSERT) tanpa cleanup otomatis.
+// Untuk benchmark berulang, ini akan terus menambah ukuran tabel users dan
+// memengaruhi repeatability. Register diuji di smoke/functional test saja.
 //
-// Untuk stress/spike test (500 VU), tambahkan 500 user lagi:
-//   SELECT email FROM users WHERE role='USER'
-//   ORDER BY created_at OFFSET 500 LIMIT 500;
+// Endpoint yang diuji (per VU per iterasi):
+//   REST : POST /auth/login, GET /auth/me, POST /auth/refresh, POST /auth/logout
+//   tRPC : auth.login, auth.me, auth.refresh, auth.logout
+//
+// Negative path (30% VU): login dengan credential salah → harus return 4xx
+//
+// Run examples:
+//   k6 run s04_auth.js
+//   k6 run -e API=trpc -e TEST_TYPE=stress s04_auth.js
+//   k6 run -e API=rest  -e TEST_TYPE=spike  s04_auth.js
 // =============================================================
 
-import http from "k6/http";
-import { check } from "k6";
-import { JSON_HEADERS } from "./config.js";
-
-export function loginREST(baseUrl, email, password) {
-  const res = http.post(
-    `${baseUrl}/auth/login`,
-    JSON.stringify({ email, password }),
-    { headers: JSON_HEADERS },
-  );
-  const ok = check(res, { "login: status 200": (r) => r.status === 200 });
-  if (!ok) console.error(`[login REST] FAILED: ${email} → ${res.status}`);
-  return ok;
-}
-
-export function loginTRPC(baseUrl, email, password) {
-  const res = http.post(
-    `${baseUrl}/auth.login`,
-    JSON.stringify({ json: { email, password } }),
-    { headers: JSON_HEADERS },
-  );
-  const ok = check(res, { "login: status 200": (r) => r.status === 200 });
-  if (!ok) console.error(`[login tRPC] FAILED: ${email} → ${res.status}`);
-  return ok;
-}
-
-export function login(apiType, baseUrl, email, password) {
-  if (apiType === "rest") return loginREST(baseUrl, email, password);
-  return loginTRPC(baseUrl, email, password);
-}
-
-export function logoutREST(baseUrl) {
-  const res = http.post(`${baseUrl}/auth/logout`, null, {
-    headers: JSON_HEADERS,
-  });
-  check(res, { "logout: status 200": (r) => r.status === 200 });
-}
-
-export function logoutTRPC(baseUrl) {
-  const res = http.post(`${baseUrl}/auth.logout`, JSON.stringify({}), {
-    headers: JSON_HEADERS,
-  });
-  check(res, { "logout: status 200": (r) => r.status === 200 });
-}
-
-export function logout(apiType, baseUrl) {
-  if (apiType === "rest") return logoutREST(baseUrl);
-  return logoutTRPC(baseUrl);
-}
+import { sleep, check, group } from "k6";
+import { Counter, Rate, Trend } from "k6/metrics";
+import {
+  API_TYPE,
+  TEST_TYPE,
+  BASE_URL,
+  STAGES,
+  THRESHOLDS_WRITE,
+  thinkTime,
+} from "./config.js";
+import { loginREST, loginTRPC, pickUser } from "./auth.js";
+import {
+  restGet,
+  restPost,
+  trpcQuery,
+  trpcMutation,
+  checkAndRecord,
+  parseResponse,
+} from "./http.js";
 
 // =============================================================
-// TEST USER POOL — 500 user nyata dari users_seed.csv
-// Semua role USER, password: Password123!
+// BASE URL
 // =============================================================
-export const TEST_USERS = [
-  "udin.wahyudi11@proton.me",
-  "budi.wirawan12@outlook.com",
-  "yoga.karim13@proton.me",
-  "irfan.mansur14@gmail.com",
-  "udin.osman15@hotmail.com",
-  "jasmine.suharto16@gmail.com",
-  "ika.suharto17@gmail.com",
-  "bintang.mansur18@hotmail.com",
-  "mita.wirawan19@gmail.com",
-  "kiki.setiawan20@hotmail.com",
-  "wawan.santoso21@gmail.com",
-  "budi.hadikusumo22@outlook.com",
-  "dian.yusron23@proton.me",
-  "sena.wibowo24@yahoo.com",
-  "fitri.pasha25@gmail.com",
-  "dedi.setiawan26@outlook.com",
-  "gita.iskandar27@outlook.com",
-  "rafi.pasha28@proton.me",
-  "mukti.hartono29@proton.me",
-  "hani.susanto30@gmail.com",
-  "rizky.saputra31@yahoo.com",
-  "zaki.kusuma32@outlook.com",
-  "andi.subagyo33@gmail.com",
-  "hafiz.halim34@hotmail.com",
-  "nisa.baskoro35@proton.me",
-  "putri.osman36@hotmail.com",
-  "fitri.vega37@hotmail.com",
-  "sari.wirawan38@outlook.com",
-  "bagas.tanjung39@yahoo.com",
-  "dian.osman40@outlook.com",
-  "jihan.adiputra41@gmail.com",
-  "kartika.maulana42@hotmail.com",
-  "hani.suharto43@yahoo.com",
-  "udin.latif44@proton.me",
-  "lina.zainal45@yahoo.com",
-  "mukti.adiputra46@outlook.com",
-  "fauzi.adiputra47@proton.me",
-  "opal.santoso48@outlook.com",
-  "ivan.hakim49@gmail.com",
-  "fajar.mansur50@gmail.com",
-  "leo.sudirman51@outlook.com",
-  "hafiz.rachmat52@gmail.com",
-  "naufal.siregar53@gmail.com",
-  "sela.nugroho54@proton.me",
-  "rafi.tanjung55@proton.me",
-  "widi.santoso56@hotmail.com",
-  "mukti.pasha57@proton.me",
-  "jasmine.zainal58@hotmail.com",
-  "yusuf.wahyudi59@outlook.com",
-  "prima.latif60@yahoo.com",
-  "jasmine.mangkunegara61@proton.me",
-  "leo.susanto62@outlook.com",
-  "opal.susanto63@proton.me",
-  "siti.vega64@proton.me",
-  "bintang.hartono65@hotmail.com",
-  "prima.saputra66@proton.me",
-  "galih.osman67@proton.me",
-  "arif.pasha68@gmail.com",
-  "kartika.rahardjo69@gmail.com",
-  "leo.saputra70@yahoo.com",
-  "kartika.pratama71@yahoo.com",
-  "reza.karim72@hotmail.com",
-  "indah.tanjung73@proton.me",
-  "bella.noor74@hotmail.com",
-  "vero.subagyo75@hotmail.com",
-  "erna.iskandar76@gmail.com",
-  "juli.zainal77@gmail.com",
-  "hesty.gunawan78@yahoo.com",
-  "wahyu.hakim79@outlook.com",
-  "cahyo.osman80@proton.me",
-  "rafi.noor81@proton.me",
-  "bagas.maulana82@outlook.com",
-  "bagas.hadikusumo83@yahoo.com",
-  "leo.santoso84@yahoo.com",
-  "vita.hadikusumo85@outlook.com",
-  "ivan.nugroho86@gmail.com",
-  "ivan.purnomo87@yahoo.com",
-  "irfan.hakim88@proton.me",
-  "wawan.rahardjo89@gmail.com",
-  "opal.nugroho90@yahoo.com",
-  "arif.tanjung91@gmail.com",
-  "umar.qasim92@gmail.com",
-  "ulfa.yusron93@hotmail.com",
-  "opal.hartono94@outlook.com",
-  "siti.wahyudi95@proton.me",
-  "dewi.pasha96@proton.me",
-  "eko.mangkunegara97@hotmail.com",
-  "fajar.yusron98@yahoo.com",
-  "juli.gunawan99@outlook.com",
-  "maya.siregar100@yahoo.com",
-  "yanti.kurniawan101@proton.me",
-  "kevin.utama102@gmail.com",
-  "lina.pratama103@yahoo.com",
-  "putri.salim104@proton.me",
-  "hani.tanjung105@gmail.com",
-  "jihan.qasim106@proton.me",
-  "nanda.usman107@gmail.com",
-  "galih.wirawan108@gmail.com",
-  "maya.tanoto109@gmail.com",
-  "sari.subagyo110@outlook.com",
-  "gita.purnomo111@hotmail.com",
-  "zulfa.alamsyah112@proton.me",
-  "xena.santoso113@yahoo.com",
-  "galih.maulana114@outlook.com",
-  "jihan.pratama115@gmail.com",
-  "rizky.baskoro116@hotmail.com",
-  "ika.santoso117@yahoo.com",
-  "andi.setiawan118@hotmail.com",
-  "leo.saputra119@outlook.com",
-  "zahra.pasha120@hotmail.com",
-  "luki.wardana121@outlook.com",
-  "cahyo.alamsyah122@outlook.com",
-  "kartika.utama123@hotmail.com",
-  "joko.firdaus124@hotmail.com",
-  "kiki.kusuma125@gmail.com",
-  "yanti.yusron126@gmail.com",
-  "putri.adiputra127@gmail.com",
-  "zaki.permana128@outlook.com",
-  "citra.hartono129@outlook.com",
-  "dedi.setiawan130@proton.me",
-  "hani.iskandar131@outlook.com",
-  "wahyu.saputra132@outlook.com",
-  "wahyu.rahardjo133@yahoo.com",
-  "okta.zainal134@hotmail.com",
-  "okta.alamsyah135@hotmail.com",
-  "opal.permana136@proton.me",
-  "ivan.wibowo137@yahoo.com",
-  "luki.permana138@yahoo.com",
-  "umar.zainal139@hotmail.com",
-  "udin.tanoto140@gmail.com",
-  "rizky.hakim141@proton.me",
-  "yusuf.gunawan142@proton.me",
-  "yanti.wijaya143@hotmail.com",
-  "putri.alamsyah144@proton.me",
-  "opal.qasim145@yahoo.com",
-  "sela.iskandar146@hotmail.com",
-  "sari.permana147@hotmail.com",
-  "luki.wirawan148@hotmail.com",
-  "prita.mangkunegara149@hotmail.com",
-  "nisa.qasim150@gmail.com",
-  "tono.saputra151@yahoo.com",
-  "aditya.salim152@gmail.com",
-  "bella.hakim153@proton.me",
-  "prima.halim154@gmail.com",
-  "wawan.hartono155@outlook.com",
-  "dewi.permana156@proton.me",
-  "opal.jabbar157@hotmail.com",
-  "tono.alamsyah158@proton.me",
-  "rafi.rahardjo159@yahoo.com",
-  "tono.qasim160@outlook.com",
-  "jihan.wirawan161@proton.me",
-  "galih.pasha162@gmail.com",
-  "ika.rahardjo163@hotmail.com",
-  "erna.setiawan164@outlook.com",
-  "vina.nugroho165@gmail.com",
-  "yoga.hakim166@proton.me",
-  "gita.noor167@outlook.com",
-  "ivan.setiawan168@outlook.com",
-  "zaki.latif169@outlook.com",
-  "nanda.wardana170@outlook.com",
-  "fitri.kusuma171@yahoo.com",
-  "ilham.sudirman172@yahoo.com",
-  "arif.mangkunegara173@hotmail.com",
-  "lina.rachmat174@proton.me",
-  "jasmine.kusuma175@proton.me",
-  "farhan.subagyo176@proton.me",
-  "bagas.sudirman177@yahoo.com",
-  "nisa.latif178@outlook.com",
-  "okta.hidayat179@proton.me",
-  "xena.salim180@outlook.com",
-  "ilham.yusron181@proton.me",
-  "naufal.nugroho182@yahoo.com",
-  "ika.alamsyah183@gmail.com",
-  "qodir.utama184@outlook.com",
-  "wawan.jabbar185@hotmail.com",
-  "kevin.vega186@yahoo.com",
-  "ulfa.wibowo187@hotmail.com",
-  "irfan.salim188@outlook.com",
-  "sari.maulana189@outlook.com",
-  "umar.firdaus190@yahoo.com",
-  "gilang.wibowo191@proton.me",
-  "bintang.karim192@yahoo.com",
-  "kiki.pratama193@hotmail.com",
-  "dedi.wahyudi194@gmail.com",
-  "joko.firdaus195@gmail.com",
-  "luki.tanjung196@proton.me",
-  "agus.mangkunegara197@hotmail.com",
-  "nisa.halim198@gmail.com",
-  "kiki.osman199@gmail.com",
-  "prita.suharto200@proton.me",
-  "rafi.susanto201@gmail.com",
-  "teguh.usman202@hotmail.com",
-  "vina.maulana203@gmail.com",
-  "vero.rachmat204@gmail.com",
-  "fitri.saputra205@yahoo.com",
-  "sari.yusron206@hotmail.com",
-  "vita.rachmat207@outlook.com",
-  "aditya.sudirman208@hotmail.com",
-  "prita.purnomo209@yahoo.com",
-  "prima.maulana210@yahoo.com",
-  "eko.saputra211@gmail.com",
-  "aditya.pratama212@proton.me",
-  "agus.jabbar213@outlook.com",
-  "irfan.halim214@proton.me",
-  "jasmine.usman215@yahoo.com",
-  "siti.usman216@yahoo.com",
-  "arif.firdaus217@outlook.com",
-  "fajar.purnomo218@hotmail.com",
-  "umar.usman219@gmail.com",
-  "gilang.wardana220@outlook.com",
-  "dian.siregar221@hotmail.com",
-  "wahyu.yusron222@hotmail.com",
-  "tono.wibowo223@yahoo.com",
-  "yanti.wibowo224@proton.me",
-  "bintang.jabbar225@yahoo.com",
-  "zahra.tanoto226@outlook.com",
-  "dinda.maulana227@gmail.com",
-  "ivan.rachmat228@proton.me",
-  "prita.yusron229@hotmail.com",
-  "fajar.karim230@yahoo.com",
-  "qodir.setiawan231@outlook.com",
-  "erna.karim232@proton.me",
-  "yusuf.rahardjo233@proton.me",
-  "sena.yusron234@proton.me",
-  "reza.purnomo235@outlook.com",
-  "widi.maulana236@yahoo.com",
-  "fitri.vega237@gmail.com",
-  "zulfa.tanoto238@hotmail.com",
-  "fajar.tanoto239@hotmail.com",
-  "ulfa.halim240@hotmail.com",
-  "rizky.baskoro241@outlook.com",
-  "irfan.mangkunegara242@gmail.com",
-  "hani.utama243@hotmail.com",
-  "kiki.pasha244@gmail.com",
-  "prima.subagyo245@hotmail.com",
-  "vita.hartono246@yahoo.com",
-  "zaki.karim247@gmail.com",
-  "lina.baskoro248@gmail.com",
-  "umar.kurniawan249@yahoo.com",
-  "prita.hartono250@proton.me",
-  "vina.vega251@outlook.com",
-  "maya.wardana252@proton.me",
-  "yusuf.saputra253@proton.me",
-  "bintang.setiawan254@proton.me",
-  "leo.santoso255@hotmail.com",
-  "zahra.pratama256@hotmail.com",
-  "tono.noor257@yahoo.com",
-  "indah.hadikusumo258@gmail.com",
-  "vina.saputra259@proton.me",
-  "juli.kurniawan260@gmail.com",
-  "nisa.rachmat261@gmail.com",
-  "hesty.iskandar262@yahoo.com",
-  "gilang.saputra263@proton.me",
-  "andi.zainal264@hotmail.com",
-  "reza.hartono265@proton.me",
-  "sela.wibowo266@proton.me",
-  "ika.gunawan267@gmail.com",
-  "umar.usman268@gmail.com",
-  "sari.alamsyah269@gmail.com",
-  "sena.permana270@gmail.com",
-  "sena.santoso271@gmail.com",
-  "galih.suharto272@outlook.com",
-  "hendra.utama273@yahoo.com",
-  "leo.santoso274@outlook.com",
-  "dinda.wirawan275@proton.me",
-  "budi.zainal276@hotmail.com",
-  "nisa.wibowo277@gmail.com",
-  "dedi.saputra278@proton.me",
-  "ulfa.sudirman279@hotmail.com",
-  "kiki.maulana280@outlook.com",
-  "maya.rahardjo281@outlook.com",
-  "sena.pratama282@outlook.com",
-  "putri.setiawan283@gmail.com",
-  "lina.saputra284@gmail.com",
-  "zahra.mansur285@hotmail.com",
-  "nisa.susanto286@hotmail.com",
-  "opal.pratama287@gmail.com",
-  "yusuf.firdaus288@proton.me",
-  "gilang.suharto289@gmail.com",
-  "irfan.susanto290@proton.me",
-  "teguh.yusron291@outlook.com",
-  "sela.utama292@hotmail.com",
-  "vero.pasha293@yahoo.com",
-  "udin.permana294@gmail.com",
-  "prima.rachmat295@outlook.com",
-  "prita.setiawan296@yahoo.com",
-  "hafiz.qasim297@proton.me",
-  "maya.vega298@outlook.com",
-  "hendra.hadikusumo299@hotmail.com",
-  "opal.mansur300@yahoo.com",
-  "widi.rahardjo301@hotmail.com",
-  "zahra.osman302@hotmail.com",
-  "okta.mangkunegara303@yahoo.com",
-  "hani.wibowo304@outlook.com",
-  "naufal.hidayat305@outlook.com",
-  "aditya.utama306@hotmail.com",
-  "nanda.wibowo307@outlook.com",
-  "naufal.mansur308@yahoo.com",
-  "jihan.purnomo309@gmail.com",
-  "ivan.halim310@yahoo.com",
-  "nisa.jabbar311@hotmail.com",
-  "fajar.noor312@gmail.com",
-  "prima.mansur313@proton.me",
-  "dedi.adiputra314@yahoo.com",
-  "nanda.suharto315@yahoo.com",
-  "fauzi.yusron316@hotmail.com",
-  "udin.mansur317@gmail.com",
-  "dinda.susanto318@outlook.com",
-  "andi.firdaus319@proton.me",
-  "yoga.mansur320@yahoo.com",
-  "andi.osman321@gmail.com",
-  "gita.maulana322@outlook.com",
-  "gilang.osman323@outlook.com",
-  "rafi.halim324@yahoo.com",
-  "lina.subagyo325@hotmail.com",
-  "yusuf.iskandar326@outlook.com",
-  "vero.rachmat327@gmail.com",
-  "mita.hidayat328@hotmail.com",
-  "bagas.jabbar329@outlook.com",
-  "teguh.vega330@yahoo.com",
-  "zahra.mansur331@yahoo.com",
-  "budi.kusuma332@proton.me",
-  "xena.mangkunegara333@yahoo.com",
-  "leo.wirawan334@proton.me",
-  "erna.wijaya335@yahoo.com",
-  "eko.hadikusumo336@outlook.com",
-  "juli.hadikusumo337@gmail.com",
-  "tasya.susanto338@proton.me",
-  "qodir.halim339@proton.me",
-  "qodir.kurniawan340@hotmail.com",
-  "sena.saputra341@gmail.com",
-  "prita.permana342@outlook.com",
-  "jihan.susanto343@gmail.com",
-  "opal.subagyo344@yahoo.com",
-  "juli.utama345@proton.me",
-  "fitri.saputra346@outlook.com",
-  "jihan.nugroho347@hotmail.com",
-  "yoga.iskandar348@hotmail.com",
-  "hafiz.latif349@hotmail.com",
-  "teguh.hidayat350@hotmail.com",
-  "hesty.pasha351@outlook.com",
-  "zulfa.alamsyah352@proton.me",
-  "prita.latif353@proton.me",
-  "dinda.halim354@gmail.com",
-  "kiki.maulana355@proton.me",
-  "sena.alamsyah356@yahoo.com",
-  "citra.subagyo357@proton.me",
-  "hesty.usman358@proton.me",
-  "xena.tanjung359@yahoo.com",
-  "bintang.siregar360@hotmail.com",
-  "hendra.siregar361@gmail.com",
-  "eko.baskoro362@hotmail.com",
-  "hendra.hadikusumo363@hotmail.com",
-  "aditya.zainal364@proton.me",
-  "sena.hidayat365@hotmail.com",
-  "vero.maulana366@yahoo.com",
-  "yusuf.saputra367@outlook.com",
-  "erna.wibowo368@outlook.com",
-  "zulfa.zainal369@gmail.com",
-  "rizky.hadikusumo370@outlook.com",
-  "prita.rachmat371@yahoo.com",
-  "gita.tanjung372@hotmail.com",
-  "maya.saputra373@gmail.com",
-  "erna.tanoto374@outlook.com",
-  "kartika.baskoro375@proton.me",
-  "dewi.firdaus376@yahoo.com",
-  "yanti.latif377@yahoo.com",
-  "farhan.yusron378@outlook.com",
-  "rizky.utama379@proton.me",
-  "dian.hakim380@outlook.com",
-  "kiki.adiputra381@proton.me",
-  "budi.sudirman382@yahoo.com",
-  "sela.hakim383@proton.me",
-  "kartika.wirawan384@gmail.com",
-  "lina.karim385@proton.me",
-  "sena.wibowo386@hotmail.com",
-  "andi.mansur387@proton.me",
-  "aditya.suharto388@gmail.com",
-  "ulfa.nugroho389@proton.me",
-  "fajar.rachmat390@gmail.com",
-  "hesty.santoso391@proton.me",
-  "yoga.permana392@proton.me",
-  "fajar.rahardjo393@hotmail.com",
-  "bintang.purnomo394@gmail.com",
-  "gita.salim395@proton.me",
-  "sena.wahyudi396@yahoo.com",
-  "putri.wijaya397@yahoo.com",
-  "eko.karim398@proton.me",
-  "aditya.kusuma399@proton.me",
-  "kevin.firdaus400@yahoo.com",
-  "tasya.hidayat401@proton.me",
-  "dian.wahyudi402@outlook.com",
-  "zulfa.firdaus403@yahoo.com",
-  "sari.yusron404@yahoo.com",
-  "hendra.rahardjo405@hotmail.com",
-  "hafiz.permana406@gmail.com",
-  "qodir.salim407@gmail.com",
-  "zahra.tanjung408@gmail.com",
-  "fajar.halim409@proton.me",
-  "hafiz.osman410@yahoo.com",
-  "kartika.iskandar411@outlook.com",
-  "opal.alamsyah412@yahoo.com",
-  "hafiz.tanjung413@yahoo.com",
-  "erna.tanjung414@outlook.com",
-  "cahyo.hakim415@yahoo.com",
-  "putri.hidayat416@gmail.com",
-  "qodir.mansur417@outlook.com",
-  "hani.firdaus418@proton.me",
-  "siti.santoso419@yahoo.com",
-  "irfan.susanto420@hotmail.com",
-  "erna.susanto421@hotmail.com",
-  "bagas.halim422@yahoo.com",
-  "teguh.hakim423@outlook.com",
-  "naufal.qasim424@gmail.com",
-  "fauzi.hidayat425@outlook.com",
-  "sena.hakim426@hotmail.com",
-  "ilham.mansur427@hotmail.com",
-  "dedi.susanto428@hotmail.com",
-  "kevin.yusron429@gmail.com",
-  "dedi.jabbar430@gmail.com",
-  "juli.qasim431@yahoo.com",
-  "mukti.latif432@hotmail.com",
-  "vita.mangkunegara433@outlook.com",
-  "rafi.santoso434@gmail.com",
-  "siti.alamsyah435@hotmail.com",
-  "dedi.gunawan436@yahoo.com",
-  "mukti.hartono437@proton.me",
-  "kiki.susanto438@proton.me",
-  "okta.susanto439@yahoo.com",
-  "galih.mangkunegara440@hotmail.com",
-  "wawan.firdaus441@yahoo.com",
-  "dinda.maulana442@gmail.com",
-  "sari.wahyudi443@hotmail.com",
-  "siti.rahardjo444@outlook.com",
-  "aditya.alamsyah445@gmail.com",
-  "wahyu.usman446@proton.me",
-  "bagas.baskoro447@yahoo.com",
-  "bella.karim448@outlook.com",
-  "prita.wahyudi449@proton.me",
-  "irfan.sudirman450@gmail.com",
-  "ulfa.subagyo451@outlook.com",
-  "prima.halim452@gmail.com",
-  "hafiz.osman453@gmail.com",
-  "ika.pasha454@outlook.com",
-  "vita.hadikusumo455@yahoo.com",
-  "bintang.baskoro456@hotmail.com",
-  "yoga.karim457@proton.me",
-  "irfan.mansur458@proton.me",
-  "okta.osman459@gmail.com",
-  "nisa.latif460@proton.me",
-  "lina.permana461@proton.me",
-  "ulfa.firdaus462@yahoo.com",
-  "vero.baskoro463@hotmail.com",
-  "teguh.karim464@proton.me",
-  "reza.wibowo465@yahoo.com",
-  "yanti.wardana466@outlook.com",
-  "dedi.rachmat467@proton.me",
-  "bintang.wibowo468@gmail.com",
-  "dewi.alamsyah469@outlook.com",
-  "aditya.purnomo470@gmail.com",
-  "kiki.firdaus471@gmail.com",
-  "jihan.wirawan472@yahoo.com",
-  "dinda.usman473@proton.me",
-  "prita.rachmat474@hotmail.com",
-  "dinda.iskandar475@hotmail.com",
-  "agus.baskoro476@outlook.com",
-  "nisa.suharto477@yahoo.com",
-  "bintang.purnomo478@hotmail.com",
-  "dinda.setiawan479@outlook.com",
-  "vita.wirawan480@gmail.com",
-  "nisa.purnomo481@yahoo.com",
-  "indah.osman482@yahoo.com",
-  "aditya.utama483@hotmail.com",
-  "fauzi.suharto484@yahoo.com",
-  "erna.alamsyah485@gmail.com",
-  "eko.jabbar486@gmail.com",
-  "tasya.zainal487@gmail.com",
-  "ilham.pratama488@proton.me",
-  "dedi.subagyo489@outlook.com",
-  "yoga.vega490@gmail.com",
-  "bagas.latif491@hotmail.com",
-  "sela.mangkunegara492@hotmail.com",
-  "qodir.hakim493@proton.me",
-  "luki.osman494@proton.me",
-  "ika.rachmat495@outlook.com",
-  "galih.utama496@yahoo.com",
-  "eko.wibowo497@outlook.com",
-  "sari.usman498@outlook.com",
-  "udin.wibowo499@hotmail.com",
-  "yusuf.setiawan500@proton.me",
-  "budi.hidayat501@gmail.com",
-  "gita.santoso502@yahoo.com",
-  "rizky.tanjung503@outlook.com",
-  "opal.firdaus504@gmail.com",
-  "tasya.mangkunegara505@proton.me",
-  "wahyu.susanto506@gmail.com",
-  "sela.vega507@outlook.com",
-  "gita.jabbar508@outlook.com",
-  "reza.purnomo509@yahoo.com",
-  "eko.maulana510@hotmail.com",
-];
 
-export const ADMIN_USERS = [
-  "admin1@zenit.dev",
-  "admin2@zenit.dev",
-  "admin3@zenit.dev",
-  "admin4@zenit.dev",
-  "admin5@zenit.dev",
-  "admin6@zenit.dev",
-  "admin7@zenit.dev",
-  "admin8@zenit.dev",
-  "admin9@zenit.dev",
-  "admin10@zenit.dev",
-];
+const BASE = BASE_URL[API_TYPE];
 
-export const TEST_PASSWORD = "Password123!";
-export const ADMIN_PASSWORD = "Password123!";
+// =============================================================
+// CUSTOM METRICS
+// =============================================================
 
-// Distribusi merata — tiap VU dapat user berbeda (1 user per VU utk 200 VU)
-export function pickUser(vu) {
-  if (TEST_USERS.length === 0) {
-    return {
-      email: `udin.wahyudi${(vu % 10000) + 1}@proton.me`,
-      password: TEST_PASSWORD,
-    };
+const loginFuncErr = new Rate("s04_login_func_err_rate");
+const loginSlaBreach = new Rate("s04_login_sla_breach_rate");
+const loginTrend = new Trend("s04_login_duration", true);
+const loginCounter = new Counter("s04_login_errors");
+
+const meFuncErr = new Rate("s04_me_func_err_rate");
+const meSlaBreach = new Rate("s04_me_sla_breach_rate");
+const meTrend = new Trend("s04_me_duration", true);
+
+const refreshFuncErr = new Rate("s04_refresh_func_err_rate");
+const refreshSlaBreach = new Rate("s04_refresh_sla_breach_rate");
+const refreshTrend = new Trend("s04_refresh_duration", true);
+const refreshCounter = new Counter("s04_refresh_errors");
+
+const logoutFuncErr = new Rate("s04_logout_func_err_rate");
+const logoutTrend = new Trend("s04_logout_duration", true);
+
+// Negative path: invalid login harus selalu return 4xx (rate ≈ 1.0 = benar)
+const invalidLoginCorrect = new Rate("s04_invalid_login_correct_rate");
+
+// =============================================================
+// OPTIONS
+// =============================================================
+
+const stageKey = `${TEST_TYPE}_auth`;
+const stages = STAGES[stageKey] || STAGES["load_auth"];
+
+export const options = {
+  scenarios: {
+    auth_flow: {
+      executor: "ramping-vus",
+      startVUs: 0,
+      stages,
+      gracefulRampDown: "30s",
+    },
+  },
+  thresholds: {
+    ...THRESHOLDS_WRITE,
+    // Auth endpoints — lebih ketat dari default write threshold
+    s04_login_duration: ["p(95)<1500", "p(99)<3000"],
+    s04_me_duration: ["p(95)<500", "p(99)<1000"],
+    s04_refresh_duration: ["p(95)<1000", "p(99)<2000"],
+    // Error rate
+    s04_login_func_err_rate: ["rate<0.02"], // max 2% login fail
+    s04_refresh_func_err_rate: ["rate<0.02"],
+    s04_invalid_login_correct_rate: ["rate>0.98"], // server harus selalu tolak creds salah
+  },
+  summaryTrendStats: ["avg", "p(50)", "p(90)", "p(95)", "p(99)", "max"],
+};
+
+// =============================================================
+// SETUP — verifikasi server up sebelum mulai VU
+// =============================================================
+
+export function setup() {
+  const firstUser = pickUser(0);
+  let up = false;
+
+  if (API_TYPE === "rest") {
+    up = loginREST(BASE, firstUser.email, firstUser.password);
+    if (up) restPost(`${BASE}/auth/logout`, {});
+  } else {
+    up = loginTRPC(BASE, firstUser.email, firstUser.password);
+    if (up) trpcMutation(BASE, "auth.logout", {});
   }
-  return { email: TEST_USERS[vu % TEST_USERS.length], password: TEST_PASSWORD };
+
+  if (!up) {
+    console.error(
+      `[setup] Server ${API_TYPE.toUpperCase()} tidak merespons login. Abort.`,
+    );
+  } else {
+    console.log(
+      `[setup] Server ${API_TYPE.toUpperCase()} @ ${BASE} siap. S-04 Auth dimulai.`,
+    );
+    console.log(
+      `[setup] NOTE: Register tidak dijalankan di load loop untuk menjaga repeatability DB.`,
+    );
+  }
+
+  return { apiType: API_TYPE };
 }
 
-export function pickAdmin(vu) {
-  return {
-    email: ADMIN_USERS[vu % ADMIN_USERS.length],
-    password: ADMIN_PASSWORD,
-  };
+// =============================================================
+// DEFAULT FUNCTION — dijalankan tiap VU per iterasi
+//
+// Flow per iterasi: login → me → refresh → (30% negative path) → logout
+// =============================================================
+
+export default function () {
+  const user = pickUser(__VU);
+  const tag = { scenario: "s04_auth", api: API_TYPE };
+
+  // ── 1. Login ─────────────────────────────────────────────
+  group("Login", function () {
+    let loginRes;
+
+    if (API_TYPE === "rest") {
+      loginRes = restPost(
+        `${BASE}/auth/login`,
+        { email: user.email, password: user.password },
+        tag,
+      );
+    } else {
+      loginRes = trpcMutation(
+        BASE,
+        "auth.login",
+        { email: user.email, password: user.password },
+        tag,
+      );
+    }
+
+    checkAndRecord(
+      loginRes,
+      "s04_login",
+      loginTrend,
+      loginFuncErr,
+      loginSlaBreach,
+      loginCounter,
+      1500,
+    );
+
+    sleep(thinkTime(0.5, 0.2));
+  });
+
+  // ── 2. /auth/me ──────────────────────────────────────────
+  group("Get Me", function () {
+    let meRes;
+
+    if (API_TYPE === "rest") {
+      meRes = restGet(`${BASE}/auth/me`, null, tag);
+    } else {
+      meRes = trpcQuery(BASE, "auth.me", {}, tag);
+    }
+
+    checkAndRecord(meRes, "s04_me", meTrend, meFuncErr, meSlaBreach, null, 500);
+
+    // Verify shape — user harus punya id + email + role
+    const data = parseResponse(API_TYPE, meRes);
+    check(data, {
+      "s04_me: id ada": (d) => d?.id != null,
+      "s04_me: email ada": (d) => d?.email != null,
+      "s04_me: role ada": (d) => d?.role != null,
+    });
+
+    sleep(thinkTime(0.3, 0.1));
+  });
+
+  // ── 3. Refresh Token ─────────────────────────────────────
+  group("Refresh Token", function () {
+    let refreshRes;
+
+    if (API_TYPE === "rest") {
+      refreshRes = restPost(`${BASE}/auth/refresh`, {}, tag);
+    } else {
+      refreshRes = trpcMutation(BASE, "auth.refresh", {}, tag);
+    }
+
+    checkAndRecord(
+      refreshRes,
+      "s04_refresh",
+      refreshTrend,
+      refreshFuncErr,
+      refreshSlaBreach,
+      refreshCounter,
+      1000,
+    );
+
+    sleep(thinkTime(0.5, 0.2));
+  });
+
+  // ── 4. Negative Path — invalid credentials (30% VU) ──────
+  // Server HARUS selalu return 4xx untuk credential salah.
+  // Kalau 2xx berarti auth endpoint rusak serius.
+  if (Math.random() < 0.3) {
+    group("Invalid Login (Negative Path)", function () {
+      let badRes;
+
+      if (API_TYPE === "rest") {
+        badRes = restPost(
+          `${BASE}/auth/login`,
+          { email: user.email, password: "WrongPassword_NotReal_k6!" },
+          tag,
+        );
+      } else {
+        badRes = trpcMutation(
+          BASE,
+          "auth.login",
+          { email: user.email, password: "WrongPassword_NotReal_k6!" },
+          tag,
+        );
+      }
+
+      const correctlyRejected = check(badRes, {
+        "s04_invalid_login: return 4xx": (r) =>
+          r.status >= 400 && r.status < 500,
+      });
+      invalidLoginCorrect.add(correctlyRejected ? 1 : 0);
+
+      sleep(thinkTime(0.2, 0.1));
+    });
+  }
+
+  // ── 5. Logout ─────────────────────────────────────────────
+  group("Logout", function () {
+    let logoutRes;
+
+    if (API_TYPE === "rest") {
+      logoutRes = restPost(`${BASE}/auth/logout`, {}, tag);
+    } else {
+      logoutRes = trpcMutation(BASE, "auth.logout", {}, tag);
+    }
+
+    checkAndRecord(
+      logoutRes,
+      "s04_logout",
+      logoutTrend,
+      logoutFuncErr,
+      null,
+      null,
+      1000,
+    );
+
+    sleep(thinkTime(1.0, 0.3));
+  });
+}
+
+// =============================================================
+// TEARDOWN
+// =============================================================
+export function teardown(data) {
+  console.log(
+    `[teardown] S-04 Auth selesai. API: ${data.apiType}.\n` +
+      `Metrik penting: s04_login_func_err_rate, s04_refresh_func_err_rate,\n` +
+      `s04_login_duration (p95/p99), s04_invalid_login_correct_rate.\n` +
+      `NOTE: Tidak ada user baru dibuat selama load test ini — DB bersih.`,
+  );
 }

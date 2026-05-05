@@ -16,6 +16,16 @@ import { SORT_OPTIONS, DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { ProductListParams } from "@/types";
 
+
+// [FIX] parseNumParam: aman untuk nilai 0
+// Number("") === 0 dan Number(null) === 0, keduanya falsish → || undefined gagal untuk nilai 0.
+// Cek string kosong/null terlebih dahulu sebelum konversi.
+function parseNumParam(s: string | null | undefined): number | undefined {
+  if (s === null || s === undefined || s.trim() === "") return undefined;
+  const n = Number(s);
+  return isNaN(n) ? undefined : n;
+}
+
 export default function ProductsPage() {
   const router        = useRouter();
   const searchParams  = useSearchParams();
@@ -27,8 +37,9 @@ export default function ProductsPage() {
     limit:      DEFAULT_PAGE_SIZE,
     categoryId: searchParams.get("categoryId")         || undefined,
     q:          searchParams.get("q")                  || undefined,
-    minPrice:   Number(searchParams.get("minPrice"))   || undefined,
-    maxPrice:   Number(searchParams.get("maxPrice"))   || undefined,
+    minPrice:   parseNumParam(searchParams.get("minPrice")),
+    maxPrice:   parseNumParam(searchParams.get("maxPrice")),
+    minRating: parseNumParam(searchParams.get("minRating")),
     sortBy:     (searchParams.get("sortBy") as ProductListParams["sortBy"]) || "createdAt",
     sortOrder:  (searchParams.get("sortOrder") as "asc" | "desc") || "desc",
   });
@@ -46,8 +57,9 @@ export default function ProductsPage() {
     if (params.page && params.page > 1)  p.set("page", String(params.page));
     if (params.categoryId)               p.set("categoryId", params.categoryId);
     if (params.q)                        p.set("q", params.q);
-    if (params.minPrice)                 p.set("minPrice", String(params.minPrice));
-    if (params.maxPrice)                 p.set("maxPrice", String(params.maxPrice));
+    if (params.minPrice != null)         p.set("minPrice", String(params.minPrice));
+    if (params.maxPrice != null)         p.set("maxPrice", String(params.maxPrice));
+    if (params.minRating != null) p.set("minRating", String(params.minRating));
     if (params.sortBy && params.sortBy !== "createdAt") p.set("sortBy", params.sortBy);
     if (params.sortOrder && params.sortOrder !== "desc") p.set("sortOrder", params.sortOrder);
     router.replace(`/products${p.toString() ? `?${p.toString()}` : ""}`, { scroll: false });
@@ -66,8 +78,8 @@ export default function ProductsPage() {
   function applyPriceFilter() {
     setParams(prev => ({
       ...prev,
-      minPrice: minPriceInput ? Number(minPriceInput) : undefined,
-      maxPrice: maxPriceInput ? Number(maxPriceInput) : undefined,
+      minPrice: parseNumParam(minPriceInput),
+      maxPrice: parseNumParam(maxPriceInput),
       page: 1,
     }));
   }
@@ -88,7 +100,8 @@ export default function ProductsPage() {
   const activeFilters = [
     params.categoryId && categories?.find(c => c.id === params.categoryId)?.name,
     params.q          && `"${params.q}"`,
-    (params.minPrice || params.maxPrice) && `Rp ${params.minPrice?.toLocaleString("id-ID") ?? "0"} – ${params.maxPrice?.toLocaleString("id-ID") ?? "∞"}`,
+    (params.minPrice != null || params.maxPrice != null) && `Rp ${params.minPrice?.toLocaleString("id-ID") ?? "0"} – ${params.maxPrice?.toLocaleString("id-ID") ?? "∞"}`,
+    params.minRating != null && `⭐ ${params.minRating}+`,
   ].filter(Boolean) as string[];
 
   return (

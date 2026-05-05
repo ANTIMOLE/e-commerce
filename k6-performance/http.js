@@ -51,14 +51,14 @@ export function restDelete(url, tags) {
 
 export function trpcQuery(baseUrl, procedure, input, tags) {
   const inputStr = input
-    ? encodeURIComponent(JSON.stringify({ json: input }))
-    : encodeURIComponent("{}");
+  ? encodeURIComponent(JSON.stringify(input))
+  : encodeURIComponent("{}");
   const url = `${baseUrl}/${procedure}?input=${inputStr}`;
   return http.get(url, { headers: JSON_HEADERS, tags });
 }
 
 export function trpcMutation(baseUrl, procedure, input, tags) {
-  const body = JSON.stringify({ json: input ?? {} });
+  const body = JSON.stringify(input ?? {});
   return http.post(`${baseUrl}/${procedure}`, body, {
     headers: JSON_HEADERS,
     tags,

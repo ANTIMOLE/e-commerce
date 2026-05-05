@@ -132,6 +132,10 @@ export default function AdminDashboardPage() {
                       src={getImageUrl(product.images[0])}
                       alt={product.name}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = "/images/placeholder-product.png";
+                        e.currentTarget.onerror = null; // prevent loop
+                      }}
                     />
                   </div>
                   {/* Info */}

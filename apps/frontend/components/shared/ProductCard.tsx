@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Star } from "lucide-react";
-import { cn, formatPrice, formatSoldCount, getImageUrl, truncate } from "@/lib/utils";
+import { cn, formatPrice, formatSoldCount, truncate } from "@/lib/utils";
 import { PLACEHOLDER_IMAGE, ROUTES } from "@/lib/constants";
 import type { Product } from "@/types";
 
@@ -14,17 +14,29 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, className }: ProductCardProps) {
-  // Fallback chain: images[0] (tokopedia URL) → images[1] (local /public/) → placeholder
-  const [imgSrc, setImgSrc] = useState(() => getImageUrl(product.images[0]));
+  // [FIX] Fallback chain: images[0] (tokopedia URL) → images[1] (local /public/) → placeholder
+  //
+  // BUG LAMA: getImageUrl() mengembalikan PLACEHOLDER_IMAGE kalau URL expired,
+  // sehingga imgSrc langsung jadi placeholder — onError tidak pernah firing,
+  // dan images[1] tidak pernah dicoba.
+  //
+  // FIX: Inisialisasi dengan URL mentah (images[0]). Biarkan browser yang
+  // mencoba fetch dan trigger onError kalau gagal (expired/404/network error).
+  // Seluruh fallback chain dikelola di handleImageError.
+  const [imgSrc, setImgSrc] = useState<string>(
+    product.images[0] || PLACEHOLDER_IMAGE
+  );
 
   const handleImageError = () => {
     const localPath = product.images[1]; // e.g. "images/category/slug.jpg"
     if (localPath && imgSrc !== `/${localPath}`) {
-      // Try local copy served from /public/
+      // Step 2: coba copy lokal yang disimpan di /public/
       setImgSrc(`/${localPath}`);
-    } else {
+    } else if (imgSrc !== PLACEHOLDER_IMAGE) {
+      // Step 3: fallback ke placeholder
       setImgSrc(PLACEHOLDER_IMAGE);
     }
+    // Kalau imgSrc sudah PLACEHOLDER_IMAGE, stop — jangan infinite loop
   };
 
   return (
@@ -45,6 +57,9 @@ export function ProductCard({ product, className }: ProductCardProps) {
           className="object-cover group-hover:scale-105 transition-transform duration-300"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           onError={handleImageError}
+          // unoptimized hanya untuk URL tokopedia yang mungkin punya query string
+          // kompleks; Next.js image optimizer tetap jalan untuk path lokal
+          unoptimized={imgSrc.startsWith("http")}
         />
         {/* Discount badge */}
         {product.discount && product.discount > 0 ? (

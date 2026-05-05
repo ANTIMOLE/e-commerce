@@ -1,7 +1,7 @@
 import { z }                  from "zod";
-import { router, protectedProcedure } from "../trpc/init";
 import { serviceCall }        from "../trpc/errors";
 import * as orderService      from "../services/order.service";
+import { router, protectedProcedure, adminProcedure } from "../trpc/init";
 
 const orderStatusEnum = z.enum([
   "pending_payment", "confirmed", "processing",
@@ -63,18 +63,18 @@ export const orderRouter = router({
   // ── POST /orders/:orderId/ship ────────────────────────────
   // REST:  POST /orders/:orderId/ship
   // tRPC:  trpc.order.ship.useMutation()
-  ship: protectedProcedure
-    .input(z.object({ orderId: z.string().uuid() }))
-    .mutation(async ({ input }) => {
-      return serviceCall(() => orderService.shipOrder(input.orderId));
-    }),
+ship: adminProcedure
+  .input(z.object({ orderId: z.string().uuid() }))
+  .mutation(async ({ input }) => {
+    return serviceCall(() => orderService.shipOrder(input.orderId));
+  }),
 
   // ── POST /orders/:orderId/deliver ─────────────────────────
   // REST:  POST /orders/:orderId/deliver
   // tRPC:  trpc.order.deliver.useMutation()
-  deliver: protectedProcedure
-    .input(z.object({ orderId: z.string().uuid() }))
-    .mutation(async ({ input }) => {
-      return serviceCall(() => orderService.deliverOrder(input.orderId));
-    }),
+deliver: adminProcedure
+  .input(z.object({ orderId: z.string().uuid() }))
+  .mutation(async ({ input }) => {
+    return serviceCall(() => orderService.deliverOrder(input.orderId));
+  }),
 });

@@ -54,8 +54,14 @@ export const authenticate = async (
       return;
     }
 
-    // Pastikan user masih ada di database
-    const user = await prisma.user.findUnique({
+    // RESEARCH DESIGN NOTE (B-04 — Bab III Metodologi Skripsi):
+        // REST middleware selalu melakukan DB lookup (SELECT user by id) di setiap
+        // authenticated request. Ini menambah 1 query DB per request dibandingkan
+        // tRPC dengan AUTH_DB_VALIDATION=false (stateless JWT-only, default tRPC).
+        // Implikasi benchmark: hasil latency REST untuk endpoint authenticated
+        // mencakup overhead query ini. Untuk perbandingan equalized, jalankan tRPC
+        // dengan AUTH_DB_VALIDATION=true (lihat apps/backend-trpc/.env.example).
+        const user = await prisma.user.findUnique({
       where:  { id: decoded.userId },
       select: { id: true, role: true },
     });

@@ -28,7 +28,6 @@ export function useProductList(params: ProductListParams = {}) {
         filteredParams.sortBy = SORT_BY_MAP[filteredParams.sortBy as string] ?? filteredParams.sortBy;
       }
 
-      console.log("Fetching with params:", filteredParams); // Debug di console browser
 
       const res = await api.get("/products", { params: filteredParams });
       return res.data;

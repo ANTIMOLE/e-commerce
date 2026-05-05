@@ -38,9 +38,23 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "placehold.co" },
       {
+        // CDN utama Tokopedia — path masih dibatasi ke /img/**
         protocol: "https",
         hostname: "images.tokopedia.net",
         pathname: "/img/**",
+      },
+      {
+        // [FIX] Wildcard semua subdomain tokopedia-static.net
+        // Contoh yang ada di dataset: images.tokopedia.net,
+        // p16-images-sign-sg.tokopedia-static.net, dsb.
+        // Next.js mendukung "**.hostname" untuk matching semua subdomain.
+        protocol: "https",
+        hostname: "**.tokopedia-static.net",
+      },
+      {
+        // [FIX] Fallback bare tokopedia-static.net (tanpa subdomain)
+        protocol: "https",
+        hostname: "tokopedia-static.net",
       },
     ],
   },

@@ -82,9 +82,16 @@ export const SORT_OPTIONS = [
 ] as const;
 
 // ── Auth ──────────────────────────────────────────────────────
+// [FIX] Konstanta berikut tidak aktif dipakai — model auth sudah cookie-only
+// (httpOnly cookie diset oleh backend, bukan client). Disimpan untuk referensi
+// kalau ada kebutuhan migrasi ke localStorage di masa depan, tapi jangan pakai
+// untuk menyimpan token secara aktif.
+/** @deprecated Auth model sudah cookie-only. Jangan pakai untuk storage aktif. */
 export const ACCESS_TOKEN_KEY  = "access_token";
+/** @deprecated Auth model sudah cookie-only. Jangan pakai untuk storage aktif. */
 export const REFRESH_TOKEN_KEY = "refresh_token";
-export const TOKEN_EXPIRY_BUFFER = 60; // seconds — refresh 60 detik sebelum expire
+/** @deprecated Auth model sudah cookie-only. Jangan pakai untuk storage aktif. */
+export const TOKEN_EXPIRY_BUFFER = 60; // seconds
 
 // ── Routes ────────────────────────────────────────────────────
 export const ROUTES = {

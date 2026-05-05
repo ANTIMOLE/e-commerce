@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect } from "react";
@@ -54,13 +53,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       return;
     }
     // User login tapi bukan ADMIN → ke home
-    if ((user as any).role !== "ADMIN") {
+    if (user.role !== "ADMIN") {
       router.replace("/");
     }
   }, [user, isLoading, router, pathname]);
 
   // Loading saat cek auth
-  if (isLoading || !user || (user as any).role !== "ADMIN") {
+  if (isLoading || !user || user.role !== "ADMIN") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center gap-3">

@@ -32,6 +32,8 @@ function mapParams(params: ProductListParams) {
 }
 
 // ── useProductList ─────────────────────────────────────────────
+// Returns paginated result { data, totalCount, totalPages, page }
+// This shape matches what products/page.tsx expects (result.data.map)
 export function useProductList(params: ProductListParams = {}) {
   return trpc.product.getAll.useQuery(mapParams(params), {
     staleTime: 60_000,
@@ -47,10 +49,17 @@ export function useProductDetail(slug: string) {
 }
 
 // ── useBestsellers ─────────────────────────────────────────────
+// FIX C-01: tRPC getAll returns paginated { data: Product[], totalCount, ... }
+// but homepage does products?.map(p => ...) expecting Product[].
+// Use `select` to extract the inner array — query.data will be Product[].
+// This matches the REST hook return type exactly.
 export function useBestsellers() {
   return trpc.product.getAll.useQuery(
     { sortBy: "sold_count", sortOrder: "desc", limit: 8 },
-    { staleTime: 5 * 60_000 }
+    {
+      staleTime: 5 * 60_000,
+      select: (data) => data?.data ?? [],
+    }
   );
 }
 
@@ -66,20 +75,26 @@ export function useProductSearch(q: string) {
 }
 
 // ── useNewArrivals ─────────────────────────────────────────────
+// FIX C-01 same as useBestsellers: extract Product[] from paginated result
 export function useNewArrivals() {
   return trpc.product.getAll.useQuery(
     { sortBy: "created_at", sortOrder: "desc", limit: 8 },
-    { staleTime: 5 * 60_000 }
+    {
+      staleTime: 5 * 60_000,
+      select: (data) => data?.data ?? [],
+    }
   );
 }
 
 // ── useCategoryProducts ────────────────────────────────────────
+// FIX C-01 same: extract Product[] from paginated result
 export function useCategoryProducts(categoryId: string, limit = 12) {
   return trpc.product.getAll.useQuery(
     { categoryId, limit },
     {
       enabled:   !!categoryId,
       staleTime: 60_000,
+      select: (data) => data?.data ?? [],
     }
   );
 }

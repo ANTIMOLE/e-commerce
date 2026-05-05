@@ -57,17 +57,15 @@ export function generateSlug(text: string): string {
 }
 
 // ── Image URL Handler ─────────────────────────────────────────
-// Tokopedia image URLs expire — fallback ke placeholder
+// [FIX] Hapus x-expires check — check ini menyebabkan fungsi return PLACEHOLDER_IMAGE
+// sebelum browser sempat mencoba fetch URL. Akibatnya onError di Image/img tidak
+// pernah firing, sehingga fallback chain ke images[1] lokal tidak pernah berjalan.
+//
+// Sekarang: return url mentah, biarkan browser yang mencoba. Kalau gagal (expired/404),
+// browser trigger onError di element — caller harus pasang onError untuk fallback.
+// Null/empty tetap return PLACEHOLDER_IMAGE karena tidak ada URL yang bisa dicoba.
 export function getImageUrl(url: string | null | undefined): string {
   if (!url || url.trim() === "") return PLACEHOLDER_IMAGE;
-  // Cek apakah URL masih valid (belum expired)
-  try {
-    const u = new URL(url);
-    const expires = u.searchParams.get("x-expires");
-    if (expires && parseInt(expires) * 1000 < Date.now()) return PLACEHOLDER_IMAGE;
-  } catch {
-    return PLACEHOLDER_IMAGE;
-  }
   return url;
 }
 

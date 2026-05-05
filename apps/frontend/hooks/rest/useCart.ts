@@ -5,14 +5,15 @@ import { api, getErrorMessage } from "@/lib/api";
 import { queryKeys } from "@/lib/queryClient";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import { ROUTES } from "@/lib/constants";
 
 // ── Types untuk raw cart dari backend ─────────────────────────
-// Backend mengembalikan bentuk ini (dari cart.service.ts cartSelect)
 interface RawCartItem {
   id:          string;
   productId:   string;
   quantity:    number;
-  priceAtTime: string | number;  // Prisma Decimal → string
+  priceAtTime: string | number;
   product: {
     name:        string;
     images:      string[];
@@ -47,8 +48,9 @@ function computeCartSummary(cart: RawCart | undefined) {
 // useCart — semua operasi keranjang belanja
 // ============================================================
 export function useCart() {
-  const qc                               = useQueryClient();
+  const qc                                          = useQueryClient();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const router                                      = useRouter();
 
   // ── GET /cart ────────────────────────────────────────────
   const {
@@ -61,37 +63,42 @@ export function useCart() {
       const res = await api.get<{ success: boolean; data: RawCart }>("/cart");
       return res.data.data;
     },
-    // Hanya fetch kalau user sudah login
     enabled:   isAuthenticated && !authLoading,
     staleTime: 30_000,
     retry:     1,
   });
 
   const { subtotal, tax, total, itemCount } = computeCartSummary(rawCart);
-  const isEmpty  = !rawCart || rawCart.items.length === 0;
+  const isEmpty   = !rawCart || rawCart.items.length === 0;
   const isLoading = isLoadingCart || authLoading;
 
-  // ── POST /cart/items ─────────────────────────────────────
+  // ── POST /cart ───────────────────────────────────────────
   const { mutateAsync: addItem, isPending: isAddingItem } = useMutation({
     mutationFn: async (input: { productId: string; quantity: number }) => {
-      const res = await api.post<{ success: boolean; message: string }>(
-        "/cart", input
-      );
+      // Guard: redirect ke login kalau belum auth
+      if (!isAuthenticated) {
+        toast.error("Silakan login terlebih dahulu");
+        router.push(`${ROUTES.LOGIN}?from=${encodeURIComponent(window.location.pathname)}`);
+        throw new Error("Unauthenticated");
+      }
+      const res = await api.post<{ success: boolean; message: string }>("/cart", input);
       return res.data;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.cart.all });
       toast.success("Produk ditambahkan ke keranjang");
     },
-    onError: (err) => toast.error(getErrorMessage(err)),
+    onError: (err: Error) => {
+      if (err.message !== "Unauthenticated") {
+        toast.error(getErrorMessage(err));
+      }
+    },
   });
 
-  // ── PATCH /cart/items/:cartItemId ─────────────────────────
+  // ── PATCH /cart/:itemId ──────────────────────────────────
   const { mutateAsync: updateItem, isPending: isUpdatingItem } = useMutation({
     mutationFn: async ({ cartItemId, quantity }: { cartItemId: string; quantity: number }) => {
-      const res = await api.patch<{ success: boolean }>(
-        `/cart/${cartItemId}`, { quantity }
-      );
+      const res = await api.patch<{ success: boolean }>(`/cart/${cartItemId}`, { quantity });
       return res.data;
     },
     onSuccess: () => {
@@ -100,7 +107,7 @@ export function useCart() {
     onError: (err) => toast.error(getErrorMessage(err)),
   });
 
-  // ── DELETE /cart/items/:cartItemId ────────────────────────
+  // ── DELETE /cart/:itemId ─────────────────────────────────
   const { mutateAsync: removeItem, isPending: isRemovingItem } = useMutation({
     mutationFn: async (cartItemId: string) => {
       await api.delete(`/cart/${cartItemId}`);
@@ -112,7 +119,7 @@ export function useCart() {
     onError: (err) => toast.error(getErrorMessage(err)),
   });
 
-  // ── DELETE /cart (clear all) ──────────────────────────────
+  // ── DELETE /cart ─────────────────────────────────────────
   const { mutateAsync: clearCart, isPending: isClearing } = useMutation({
     mutationFn: async () => {
       await api.delete("/cart");
@@ -127,7 +134,7 @@ export function useCart() {
   const isMutating = isAddingItem || isUpdatingItem || isRemovingItem || isClearing;
 
   return {
-    cart:           rawCart,
+    cart:       rawCart,
     isLoading,
     isError,
     isEmpty,
@@ -136,7 +143,6 @@ export function useCart() {
     tax,
     total,
     isMutating,
-    // mutations
     addItem,        isAddingItem,
     updateItem,     isUpdatingItem,
     removeItem,     isRemovingItem,

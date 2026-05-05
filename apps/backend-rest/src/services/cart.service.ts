@@ -2,18 +2,6 @@ import { Prisma } from "@ecommerce/shared/generated/prisma";
 import { prisma } from "../config/database";
 import { AppError } from "../middlewares/error.middleware";
 
-
-// export interface CartItem {
-//     productId: string;
-//     quantity: number;
-// }
-
-// export interface Cart {
-//     id: string;
-//     userId: string;
-//     items: CartItem[];
-// }
-
 const cartSelect = {
     id: true,
     userId: true,
@@ -43,6 +31,40 @@ const cartSelect = {
 const applyDiscount = (price: number, discount: number) =>
     discount > 0 ? price * (1 - discount / 100) : price;
 
+// ─── PRIVATE HELPERS ──────────────────────────────────────────────────────────
+
+// Lean read: only fetches cart id + status, no JOIN, no reconciliation.
+// Used at the start of every mutation instead of the full getCartByUserId.
+async function getActiveCartId(userId: string): Promise<string> {
+    let cart = await prisma.cart.findUnique({
+        where: { userId },
+        select: { id: true, status: true },
+    });
+
+    if (!cart || cart.status === "checked_out") {
+        cart = await prisma.cart.create({
+            data: { userId, status: "active" },
+            select: { id: true, status: true },
+        });
+    }
+
+    return cart.id;
+}
+
+// Single lean read after a mutation — returns fresh cart without running
+// reconciliation (stock/price sync). Safe because the mutation itself
+// already validated stock and wrote the correct priceAtTime.
+async function fetchFreshCart(userId: string) {
+    return prisma.cart.findUniqueOrThrow({
+        where: { userId, status: "active" },
+        select: cartSelect,
+    });
+}
+
+// ─── PUBLIC API ───────────────────────────────────────────────────────────────
+
+// GET endpoint: reconciliation runs here, on reads. This is the right place
+// for lazy stock/price sync — not inside every write operation.
 export async function getCartByUserId(userId: string) {
     let cart = await prisma.cart.findUnique({
         where: { userId },
@@ -131,7 +153,7 @@ export async function getCartByUserId(userId: string) {
 }
 
 export async function addItemToCart(userId: string, productId: string, quantity: number) {
-    const cart = await getCartByUserId(userId);
+    const cartId = await getActiveCartId(userId);   // 1 DB call (lean)
 
     const product = await prisma.product.findUnique({
         where: { id: productId },
@@ -139,20 +161,24 @@ export async function addItemToCart(userId: string, productId: string, quantity:
     });
     if (!product) throw new AppError("Produk tidak ditemukan.", 404);
 
-    const existingItem = cart.items.find(item => item.productId === productId);
+    // Use the DB unique index instead of loading all cart items into memory
+    const existingItem = await prisma.cartItem.findUnique({
+        where: { cartId_productId: { cartId, productId } },
+        select: { id: true, quantity: true },
+    });
+
     const totalQuantity = (existingItem?.quantity ?? 0) + quantity;
-    if (product.stock < totalQuantity) throw new AppError("Stok tidak cukup.", 400)
+    if (product.stock < totalQuantity) throw new AppError("Stok tidak cukup.", 400);
+
     if (existingItem) {
-        // Update quantity
         await prisma.cartItem.update({
             where: { id: existingItem.id },
             data: { quantity: existingItem.quantity + quantity },
         });
     } else {
-        // Tambah item baru
         await prisma.cartItem.create({
             data: {
-                cartId: cart.id,
+                cartId,
                 productId: product.id,
                 quantity,
                 priceAtTime: applyDiscount(
@@ -162,18 +188,25 @@ export async function addItemToCart(userId: string, productId: string, quantity:
             },
         });
     }
+
+    return fetchFreshCart(userId);  // 1 DB call (lean)
+    // Total: 4 calls. Was: up to 10.
 }
 
 export async function updateCartItem(userId: string, itemId: string, quantity: number) {
-    const cart = await getCartByUserId(userId);
+    const cartId = await getActiveCartId(userId);   // 1 DB call (lean)
 
-    const item = cart.items.find(item => item.id === itemId);
+    // Validate item belongs to this cart — no need to load all items
+    const item = await prisma.cartItem.findFirst({
+        where: { id: itemId, cartId },
+        select: { id: true, productId: true },
+    });
     if (!item) throw new AppError("Item tidak ditemukan di cart.", 404);
 
     // Auto remove kalau quantity 0
     if (quantity === 0) {
         await prisma.cartItem.delete({ where: { id: itemId } });
-        return;
+        return fetchFreshCart(userId);
     }
 
     const product = await prisma.product.findUnique({
@@ -187,21 +220,31 @@ export async function updateCartItem(userId: string, itemId: string, quantity: n
         where: { id: itemId },
         data: { quantity },
     });
+
+    return fetchFreshCart(userId);  // 1 DB call (lean)
+    // Total: 4 calls. Was: up to 10.
 }
 
 export async function removeCartItem(userId: string, itemId: string) {
-    const cart = await getCartByUserId(userId);
+    const cartId = await getActiveCartId(userId);   // 1 DB call (lean)
 
-
-    const item = cart.items.find(item => item.id === itemId);
+    const item = await prisma.cartItem.findFirst({
+        where: { id: itemId, cartId },
+        select: { id: true },
+    });
     if (!item) throw new AppError("Item tidak ditemukan di cart.", 404);
 
     await prisma.cartItem.delete({ where: { id: itemId } });
+
+    return fetchFreshCart(userId);  // 1 DB call (lean)
+    // Total: 3 calls. Was: up to 9.
 }
 
-
 export async function clearCart(userId: string) {
-    const cart = await getCartByUserId(userId);
+    const cartId = await getActiveCartId(userId);   // 1 DB call (lean)
 
-    await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
+    await prisma.cartItem.deleteMany({ where: { cartId } });
+
+    return fetchFreshCart(userId);  // 1 DB call (lean)
+    // Total: 3 calls. Was: up to 9.
 }

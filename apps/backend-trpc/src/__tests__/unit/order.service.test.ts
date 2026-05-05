@@ -8,7 +8,14 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-
+/**
+ * COVERAGE NOTE (D-03):
+ * Unit test ini menguji logika state-machine service (business rules, status transitions)
+ * secara terisolasi dengan semua dependency di-mock.
+ * Guard admin untuk ship/deliver ada di ROUTER layer (order.router.ts → adminProcedure),
+ * bukan di service layer — ini by design.
+ * Coverage guard admin secara end-to-end ada di: api-tests/src/trpc.test.ts section 08.
+ */
 // ─── MOCK ─────────────────────────────────────────────────────
 
 vi.mock("../../config/database", () => ({

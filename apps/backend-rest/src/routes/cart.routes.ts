@@ -1,7 +1,7 @@
 import { Router,IRouter } from "express";
 import { validate } from "../middlewares/validate.middleware";
 import { authenticate } from "../middlewares/auth.middleware";
-import { addCartItemSchema, cartItemIdSchema, updateCartItemSchema } from "@ecommerce/shared";
+import { addCartItemSchema, updateCartItemSchema } from "@ecommerce/shared";
 import {
     addItemToCartController,
     getCartController,
@@ -17,6 +17,6 @@ export const cartRoutes: IRouter = Router();
 
 cartRoutes.get   ("/",         authenticate, getCartController);
 cartRoutes.post  ("/",         authenticate, validate(addCartItemSchema),    addItemToCartController);
-cartRoutes.patch ("/:itemId",  authenticate, validate(updateCartItemSchema), updateCartItemController);
+cartRoutes.patch ("/:itemId", authenticate, validate(updateCartItemSchema), updateCartItemController);
 cartRoutes.delete("/",         authenticate, clearCartController);
 cartRoutes.delete("/:itemId", authenticate, removeCartItemController);

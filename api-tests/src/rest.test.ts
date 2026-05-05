@@ -761,6 +761,50 @@ describe.sequential("REST API — Functional Blackbox Test", () => {
       expect(res.status).toBe(404);
     });
 
+    it("POST /orders/:orderId/confirm 403/404 — user lain tidak bisa confirm order orang lain", async () => {
+      expect(S.orderId, "Butuh orderId").not.toBeNull();
+      const otherEmail = `cross_action_${Date.now()}@vitest.dev`;
+      const otherSession = createRestSession(REST_URL);
+      await otherSession.client.post("/auth/register", {
+        name: "Cross Action User",
+        email: otherEmail,
+        password: TEST_PASSWORD,
+      });
+      await otherSession.client.post("/auth/login", {
+        email: otherEmail,
+        password: TEST_PASSWORD,
+      });
+      // User lain coba confirm order milik S.user — harus ditolak
+      const res = await otherSession.client.post(
+        `/orders/${S.orderId}/confirm`,
+      );
+      expect(
+        res.status,
+        "User lain tidak boleh confirm order orang lain",
+      ).toBeGreaterThanOrEqual(400);
+    });
+
+    it("POST /orders/:orderId/cancel 403/404 — user lain tidak bisa cancel order orang lain", async () => {
+      expect(S.orderId, "Butuh orderId").not.toBeNull();
+      const otherEmail = `cross_cancel_${Date.now()}@vitest.dev`;
+      const otherSession = createRestSession(REST_URL);
+      await otherSession.client.post("/auth/register", {
+        name: "Cross Cancel User",
+        email: otherEmail,
+        password: TEST_PASSWORD,
+      });
+      await otherSession.client.post("/auth/login", {
+        email: otherEmail,
+        password: TEST_PASSWORD,
+      });
+      // User lain coba cancel order milik S.user — harus ditolak
+      const res = await otherSession.client.post(`/orders/${S.orderId}/cancel`);
+      expect(
+        res.status,
+        "User lain tidak boleh cancel order orang lain",
+      ).toBeGreaterThanOrEqual(400);
+    });
+
     it("POST /orders/:orderId/confirm 200 — konfirmasi pembayaran", async () => {
       expect(S.orderId, "Butuh orderId").not.toBeNull();
       const res = await S.user.client.post(`/orders/${S.orderId}/confirm`);
@@ -773,16 +817,36 @@ describe.sequential("REST API — Functional Blackbox Test", () => {
       expect(res.status).toBe(400);
     });
 
-    it("POST /orders/:orderId/ship 200 — order dikirim", async () => {
+    it("POST /orders/:orderId/ship 403 — user biasa dilarang ship (admin only)", async () => {
       expect(S.orderId, "Butuh orderId").not.toBeNull();
       const res = await S.user.client.post(`/orders/${S.orderId}/ship`);
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(403);
     });
-
-    it("POST /orders/:orderId/deliver 200 — order delivered", async () => {
+    it("POST /orders/:orderId/deliver 403 — user biasa dilarang deliver (admin only)", async () => {
       expect(S.orderId, "Butuh orderId").not.toBeNull();
       const res = await S.user.client.post(`/orders/${S.orderId}/deliver`);
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(403);
+    });
+    it("GET /orders/:orderId 403/404 — user lain tidak bisa akses order milik orang lain", async () => {
+      expect(S.orderId, "Butuh orderId").not.toBeNull();
+      // Buat sesi user baru yang berbeda
+      const otherEmail = `cross_user_${Date.now()}@vitest.dev`;
+      const otherSession = createRestSession(REST_URL);
+      await otherSession.client.post("/auth/register", {
+        name: "Cross User Test",
+        email: otherEmail,
+        password: TEST_PASSWORD,
+      });
+      await otherSession.client.post("/auth/login", {
+        email: otherEmail,
+        password: TEST_PASSWORD,
+      });
+      // User lain coba akses order milik S.user — harus ditolak
+      const res = await otherSession.client.get(`/orders/${S.orderId}`);
+      expect(
+        res.status,
+        "User lain tidak boleh lihat order orang lain",
+      ).toBeGreaterThanOrEqual(400);
     });
   });
 
@@ -942,6 +1006,18 @@ describe.sequential("REST API — Functional Blackbox Test", () => {
       expect(d?.role).toBe(me?.role);
       expect(d?.phone).toBe(me?.phone);
       expect(d?.passwordHash).toBeUndefined();
+    });
+
+    it("POST /orders/:orderId/ship 200 — admin melakukan ship order", async () => {
+      expect(S.orderId, "Butuh orderId").not.toBeNull();
+      const res = await S.admin.client.post(`/orders/${S.orderId}/ship`);
+      expect(res.status).toBe(200);
+    });
+
+    it("POST /orders/:orderId/deliver 200 — admin melakukan deliver order", async () => {
+      expect(S.orderId, "Butuh orderId").not.toBeNull();
+      const res = await S.admin.client.post(`/orders/${S.orderId}/deliver`);
+      expect(res.status).toBe(200);
     });
   });
 

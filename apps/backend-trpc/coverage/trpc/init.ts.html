@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/71</span>
+                <span class='fraction'>0/57</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/71</span>
+                <span class='fraction'>0/57</span>
             </div>
         
             
@@ -120,20 +120,7 @@
 <a name='L55'></a><a href='#L55'>55</a>
 <a name='L56'></a><a href='#L56'>56</a>
 <a name='L57'></a><a href='#L57'>57</a>
-<a name='L58'></a><a href='#L58'>58</a>
-<a name='L59'></a><a href='#L59'>59</a>
-<a name='L60'></a><a href='#L60'>60</a>
-<a name='L61'></a><a href='#L61'>61</a>
-<a name='L62'></a><a href='#L62'>62</a>
-<a name='L63'></a><a href='#L63'>63</a>
-<a name='L64'></a><a href='#L64'>64</a>
-<a name='L65'></a><a href='#L65'>65</a>
-<a name='L66'></a><a href='#L66'>66</a>
-<a name='L67'></a><a href='#L67'>67</a>
-<a name='L68'></a><a href='#L68'>68</a>
-<a name='L69'></a><a href='#L69'>69</a>
-<a name='L70'></a><a href='#L70'>70</a>
-<a name='L71'></a><a href='#L71'>71</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L58'></a><a href='#L58'>58</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -190,57 +177,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >// import { initTRPC, TRPCError } from "@trpc/server";<span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" ></span></span></span>
-<span class="cstat-no" title="statement not covered" >// import type { Context } from "./context";</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >// // ── Init tRPC ─────────────────────────────────────────────────</span>
-<span class="cstat-no" title="statement not covered" >// // Satu instance per aplikasi — jangan di-init ulang di file lain</span>
-<span class="cstat-no" title="statement not covered" >// const t = initTRPC.context&lt;Context&gt;().create();</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >// // ── Exports ───────────────────────────────────────────────────</span>
-<span class="cstat-no" title="statement not covered" >// export const router      = t.router;</span>
-<span class="cstat-no" title="statement not covered" >// export const middleware  = t.middleware;</span>
-<span class="cstat-no" title="statement not covered" >// export const mergeRouters = t.mergeRouters;</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >// // ── Public Procedure ──────────────────────────────────────────</span>
-<span class="cstat-no" title="statement not covered" >// // Bisa dipanggil tanpa auth</span>
-<span class="cstat-no" title="statement not covered" >// export const publicProcedure = t.procedure;</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >// // ── Auth Middleware ───────────────────────────────────────────</span>
-<span class="cstat-no" title="statement not covered" >// const isAuthenticated = middleware(({ ctx, next }) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >//   if (!ctx.userId) {</span>
-<span class="cstat-no" title="statement not covered" >//     throw new TRPCError({</span>
-<span class="cstat-no" title="statement not covered" >//       code:    "UNAUTHORIZED",</span>
-<span class="cstat-no" title="statement not covered" >//       message: "Anda harus login untuk mengakses fitur ini",</span>
-<span class="cstat-no" title="statement not covered" >//     });</span>
-<span class="cstat-no" title="statement not covered" >//   }</span>
-<span class="cstat-no" title="statement not covered" >//   return next({</span>
-<span class="cstat-no" title="statement not covered" >//     ctx: {</span>
-<span class="cstat-no" title="statement not covered" >//       ...ctx,</span>
-<span class="cstat-no" title="statement not covered" >//       userId:    ctx.userId,</span>
-<span class="cstat-no" title="statement not covered" >//       userEmail: ctx.userEmail,</span>
-<span class="cstat-no" title="statement not covered" >//     },</span>
-<span class="cstat-no" title="statement not covered" >//   });</span>
-<span class="cstat-no" title="statement not covered" >// });</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >// // ── Protected Procedure ───────────────────────────────────────</span>
-<span class="cstat-no" title="statement not covered" >// // Otomatis reject kalau tidak ada userId di context</span>
-<span class="cstat-no" title="statement not covered" >// export const protectedProcedure = t.procedure.use(isAuthenticated);</span>
-<span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >import { initTRPC, TRPCError } from "@trpc/server";</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" ><span class="branch-0 cbranch-no" title="branch not covered" >import { initTRPC, TRPCError } from "@trpc/server";</span></span></span>
 <span class="cstat-no" title="statement not covered" >import type { Context } from "./context";</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >const t = initTRPC.context&lt;Context&gt;().create();</span>
@@ -249,38 +186,62 @@
 <span class="cstat-no" title="statement not covered" >export const middleware    = t.middleware;</span>
 <span class="cstat-no" title="statement not covered" >export const mergeRouters  = t.mergeRouters;</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >// ── Public ────────────────────────────────────────────────────</span>
+<span class="cstat-no" title="statement not covered" >// ── Public — siapa saja boleh akses ──────────────────────────</span>
 <span class="cstat-no" title="statement not covered" >export const publicProcedure = t.procedure;</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >// ── Protected (any logged-in user) ────────────────────────────</span>
+<span class="cstat-no" title="statement not covered" >// ── Protected — harus login ───────────────────────────────────</span>
 <span class="cstat-no" title="statement not covered" >export const protectedProcedure = t.procedure.use(</span>
 <span class="cstat-no" title="statement not covered" >  middleware(({ ctx, next }) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    if (!ctx.userId) {</span>
-<span class="cstat-no" title="statement not covered" >      throw new TRPCError({ code: "UNAUTHORIZED", message: "Anda harus login untuk mengakses fitur ini" });</span>
+<span class="cstat-no" title="statement not covered" >      throw new TRPCError({</span>
+<span class="cstat-no" title="statement not covered" >        code:    "UNAUTHORIZED",</span>
+<span class="cstat-no" title="statement not covered" >        message: "Anda harus login untuk mengakses fitur ini",</span>
+<span class="cstat-no" title="statement not covered" >      });</span>
 <span class="cstat-no" title="statement not covered" >    }</span>
-<span class="cstat-no" title="statement not covered" >    return next({ ctx: { ...ctx, userId: ctx.userId, userEmail: ctx.userEmail, userRole: ctx.userRole } });</span>
+<span class="cstat-no" title="statement not covered" >    return next({</span>
+<span class="cstat-no" title="statement not covered" >      ctx: {</span>
+<span class="cstat-no" title="statement not covered" >        ...ctx,</span>
+<span class="cstat-no" title="statement not covered" >        userId:    ctx.userId,</span>
+<span class="cstat-no" title="statement not covered" >        userEmail: ctx.userEmail,</span>
+<span class="cstat-no" title="statement not covered" >        userRole:  ctx.userRole,</span>
+<span class="cstat-no" title="statement not covered" >      },</span>
+<span class="cstat-no" title="statement not covered" >    });</span>
 <span class="cstat-no" title="statement not covered" >  })</span>
 <span class="cstat-no" title="statement not covered" >);</span>
 <span class="cstat-no" title="statement not covered" ></span>
-<span class="cstat-no" title="statement not covered" >// ── Admin only ────────────────────────────────────────────────</span>
+<span class="cstat-no" title="statement not covered" >// ── Admin only — harus login DAN role ADMIN ───────────────────</span>
 <span class="cstat-no" title="statement not covered" >export const adminProcedure = t.procedure.use(</span>
 <span class="cstat-no" title="statement not covered" >  middleware(({ ctx, next }) =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >    if (!ctx.userId) {</span>
-<span class="cstat-no" title="statement not covered" >      throw new TRPCError({ code: "UNAUTHORIZED", message: "Anda harus login untuk mengakses fitur ini" });</span>
+<span class="cstat-no" title="statement not covered" >      throw new TRPCError({</span>
+<span class="cstat-no" title="statement not covered" >        code:    "UNAUTHORIZED",</span>
+<span class="cstat-no" title="statement not covered" >        message: "Anda harus login untuk mengakses fitur ini",</span>
+<span class="cstat-no" title="statement not covered" >      });</span>
 <span class="cstat-no" title="statement not covered" >    }</span>
 <span class="cstat-no" title="statement not covered" >    if (ctx.userRole !== "ADMIN") {</span>
-<span class="cstat-no" title="statement not covered" >      throw new TRPCError({ code: "FORBIDDEN", message: "Anda tidak memiliki akses ke resource ini" });</span>
+<span class="cstat-no" title="statement not covered" >      throw new TRPCError({</span>
+<span class="cstat-no" title="statement not covered" >        code:    "FORBIDDEN",</span>
+<span class="cstat-no" title="statement not covered" >        message: "Anda tidak memiliki akses ke resource ini",</span>
+<span class="cstat-no" title="statement not covered" >      });</span>
 <span class="cstat-no" title="statement not covered" >    }</span>
-<span class="cstat-no" title="statement not covered" >    return next({ ctx: { ...ctx, userId: ctx.userId, userEmail: ctx.userEmail, userRole: "ADMIN" as const } });</span>
+<span class="cstat-no" title="statement not covered" >    return next({</span>
+<span class="cstat-no" title="statement not covered" >      ctx: {</span>
+<span class="cstat-no" title="statement not covered" >        ...ctx,</span>
+<span class="cstat-no" title="statement not covered" >        userId:    ctx.userId,</span>
+<span class="cstat-no" title="statement not covered" >        userEmail: ctx.userEmail,</span>
+<span class="cstat-no" title="statement not covered" >        userRole:  "ADMIN" as const,</span>
+<span class="cstat-no" title="statement not covered" >      },</span>
+<span class="cstat-no" title="statement not covered" >    });</span>
 <span class="cstat-no" title="statement not covered" >  })</span>
-<span class="cstat-no" title="statement not covered" >);</span></pre></td></tr></table></pre>
+<span class="cstat-no" title="statement not covered" >);</span>
+&nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-29T01:37:03.934Z
+                at 2026-05-03T03:14:49.185Z
             </div>
         <script src="../prettify.js"></script>
         <script>

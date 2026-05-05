@@ -322,12 +322,7 @@ export default function () {
             tag,
           );
         } else {
-          trpcMutation(
-            BASE,
-            "admin.updateOrderStatus",
-            { id: pendingOrder.id, status: "confirmed" },
-            tag,
-          );
+          trpcMutation(BASE, "admin.updateOrderStatus", { orderId: pendingOrder.id, status: "confirmed" }, tag);
         }
         sleep(thinkTime(1, 0.2));
       } else {

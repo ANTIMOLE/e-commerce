@@ -1,8 +1,13 @@
 import jwt from "jsonwebtoken";
 import type { JwtPayload, TokenPair } from "../types";
 
-const ACCESS_SECRET  = process.env.JWT_SECRET         ?? "fallback_secret_change_this";
-const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET ?? "fallback_refresh_secret_change_this";
+const ACCESS_SECRET  = process.env.JWT_SECRET!;
+const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET!;
+
+if (!ACCESS_SECRET || !REFRESH_SECRET) {
+  throw new Error("JWT_SECRET dan JWT_REFRESH_SECRET wajib diset di environment");
+}
+
 const ACCESS_EXPIRY  = process.env.JWT_EXPIRY          ?? "1h";
 const REFRESH_EXPIRY = process.env.JWT_REFRESH_EXPIRY  ?? "7d";
 
@@ -29,7 +34,6 @@ export function verifyRefreshToken(token: string): JwtPayload {
   return jwt.verify(token, REFRESH_SECRET) as JwtPayload;
 }
 
-// Extract token dari Authorization header "Bearer <token>"
 export function extractBearerToken(authHeader?: string): string | null {
   if (!authHeader?.startsWith("Bearer ")) return null;
   return authHeader.slice(7);

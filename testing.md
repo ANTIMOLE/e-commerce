@@ -88,18 +88,7 @@ pnpm test:unit:coverage
 ✅ Tabel coverage muncul, semua threshold terpenuhi (statements ≥70%, branches ≥65%, functions ≥70%, lines ≥70%)
 ✅ Laporan HTML di `apps/backend-rest/coverage/index.html`
 
-> ⚠️ **ISSUE — `@vitest/coverage-v8` version mismatch (harus difix dulu sebelum jalankan coverage):**
->
-> `package.json` backend-rest punya `"@vitest/coverage-v8": "^4.1.5"` tapi `"vitest": "^1.6.1"`.
-> Package `coverage-v8` versi 4.x membutuhkan vitest 3.x — ini mismatch dan akan error.
->
-> **Fix:** ubah di `apps/backend-rest/package.json`:
-> ```json
-> "@vitest/coverage-v8": "^1.6.1"
-> ```
-> Lalu dari root: `pnpm install`
->
-> Command `test:unit` (tanpa coverage) tidak terpengaruh dan bisa langsung jalan.
+> ✅ Versi `@vitest/coverage-v8` di backend-rest sudah benar (`^1.6.1`) — tidak perlu diubah.
 
 ---
 ---
@@ -359,47 +348,21 @@ Whitebox (suite 1 & 2) tidak bergantung apapun — bisa dijalankan di luar uruta
 
 ## Issues yang Ditemukan
 
-### 🔴 Issue 1 — `@vitest/coverage-v8` version mismatch di backend-rest
-
-**File:** `apps/backend-rest/package.json`
-
-**Problem:** `"@vitest/coverage-v8": "^4.1.5"` tidak kompatibel dengan `"vitest": "^1.6.1"`.
-Coverage-v8 versi 4.x memerlukan vitest 3.x — `pnpm test:unit:coverage` akan error.
-
-`pnpm test:unit` (tanpa flag coverage) tidak terpengaruh.
-
-**Fix:**
-```json
-"@vitest/coverage-v8": "^1.6.1"
-```
-Lalu `pnpm install` dari root.
-
 ---
 
-### 🟡 Issue 2 — `.env.example` backend-trpc berisi kode TypeScript
+### ✅ Issue 2 — `.env.example` backend-trpc (resolved)
 
 **File:** `apps/backend-trpc/.env.example`
 
-**Problem:** File ini berisi env vars yang benar di bagian atas, lalu diikuti kode TypeScript dari `src/config/env.ts` yang ter-append (kemungkinan copy-paste tidak sengaja). Kalau file ini di-copy ke `.env`, backend gagal parse karena ada `import { z } from "zod"` di tengah file.
+~~Problem: File ini berisi kode TypeScript dari `src/config/env.ts` yang ter-append.~~
 
-**Fix:** Buka file dan hapus semua yang mulai dari baris `import { z } from "zod";` ke bawah. Yang tersisa hanya:
-
-```env
-# NODE_ENV=development
-# PORT=4001
-# DATABASE_URL="postgresql://zenit:zenit123@localhost:5432/ecommerce_db"
-# JWT_SECRET="..."
-# JWT_REFRESH_SECRET="..."
-# JWT_EXPIRY=1h
-# JWT_REFRESH_EXPIRY=7d
-# FRONTEND_URL=http://localhost:3000
-```
+File sudah bersih — hanya berisi env vars yang valid. Tidak ada action diperlukan.
 
 ---
 
 ### 🟡 Issue 3 — User test `@vitest.dev` tidak dihapus otomatis
 
-**File:** `api-tests/src/rest.test.ts` (line 235), `api-tests/src/trpc.test.ts` (line 263)
+**File:** `api-tests/src/rest.test.ts`, `api-tests/src/trpc.test.ts`
 
 **Problem:** Test membuat user `functest_<timestamp>@vitest.dev` tapi tidak ada `afterAll` yang menghapusnya. Hanya address yang dihapus oleh section 15 Cleanup. Setiap run meninggalkan 1 user + beberapa order di DB yang perlu dibersihkan manual.
 
@@ -422,7 +385,7 @@ File unit test aktif yang dipakai saat `pnpm test:unit` adalah yang ada di dalam
 cd apps/backend-rest  && pnpm test:unit
 cd apps/backend-trpc  && pnpm test:unit
 
-# Whitebox coverage (fix package.json backend-rest dulu)
+# Whitebox coverage
 cd apps/backend-rest  && pnpm test:unit:coverage
 cd apps/backend-trpc  && pnpm test:coverage
 

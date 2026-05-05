@@ -768,6 +768,50 @@ describe.sequential("tRPC API — Functional Blackbox Test", () => {
       expect(isTrpcError(res, 404)).toBe(true);
     });
 
+    it("order.confirm 403/404 — user lain tidak bisa confirm order orang lain", async () => {
+      expect(S.orderId, "Butuh orderId").not.toBeNull();
+      const otherEmail = `trpc_cross_confirm_${Date.now()}@vitest.dev`;
+      const otherSession = createTrpcSession(TRPC_URL);
+      await otherSession.mutate("auth.register", {
+        name: "Cross Confirm User",
+        email: otherEmail,
+        password: TEST_PASSWORD,
+      });
+      await otherSession.mutate("auth.login", {
+        email: otherEmail,
+        password: TEST_PASSWORD,
+      });
+      const res = await otherSession.mutate("order.confirm", {
+        orderId: S.orderId!,
+      });
+      expect(
+        isTrpcError(res, 403) || isTrpcError(res, 404),
+        `status=${res.status} — user lain tidak boleh confirm order orang lain`,
+      ).toBe(true);
+    });
+
+    it("order.cancel 403/404 — user lain tidak bisa cancel order orang lain", async () => {
+      expect(S.orderId, "Butuh orderId").not.toBeNull();
+      const otherEmail = `trpc_cross_cancel_${Date.now()}@vitest.dev`;
+      const otherSession = createTrpcSession(TRPC_URL);
+      await otherSession.mutate("auth.register", {
+        name: "Cross Cancel User",
+        email: otherEmail,
+        password: TEST_PASSWORD,
+      });
+      await otherSession.mutate("auth.login", {
+        email: otherEmail,
+        password: TEST_PASSWORD,
+      });
+      const res = await otherSession.mutate("order.cancel", {
+        orderId: S.orderId!,
+      });
+      expect(
+        isTrpcError(res, 403) || isTrpcError(res, 404),
+        `status=${res.status} — user lain tidak boleh cancel order orang lain`,
+      ).toBe(true);
+    });
+
     it("order.confirm 200 — konfirmasi pembayaran", async () => {
       expect(S.orderId, "Butuh orderId").not.toBeNull();
       const res = await S.user.mutate("order.confirm", { orderId: S.orderId! });
@@ -780,16 +824,40 @@ describe.sequential("tRPC API — Functional Blackbox Test", () => {
       expect(isTrpcError(res, 400)).toBe(true);
     });
 
-    it("order.ship 200 — order dikirim", async () => {
+    it("order.ship 403 — user biasa dilarang ship (admin only)", async () => {
       expect(S.orderId, "Butuh orderId").not.toBeNull();
       const res = await S.user.mutate("order.ship", { orderId: S.orderId! });
-      expect(isOk(res.status)).toBe(true);
+      expect(res.status).toBe(403);
     });
 
-    it("order.deliver 200 — order delivered", async () => {
+    it("order.deliver 403 — user biasa dilarang deliver (admin only)", async () => {
       expect(S.orderId, "Butuh orderId").not.toBeNull();
       const res = await S.user.mutate("order.deliver", { orderId: S.orderId! });
-      expect(isOk(res.status)).toBe(true);
+      expect(res.status).toBe(403);
+    });
+
+    it("order.getById 403/404 — user lain tidak bisa akses order milik orang lain", async () => {
+      expect(S.orderId, "Butuh orderId").not.toBeNull();
+      // Buat sesi user baru
+      const otherEmail = `trpc_cross_${Date.now()}@vitest.dev`;
+      const otherSession = createTrpcSession(TRPC_URL);
+      await otherSession.mutate("auth.register", {
+        name: "Cross User Test",
+        email: otherEmail,
+        password: TEST_PASSWORD,
+      });
+      await otherSession.mutate("auth.login", {
+        email: otherEmail,
+        password: TEST_PASSWORD,
+      });
+      // User lain coba akses order milik S.user — harus ditolak
+      const res = await otherSession.query("order.getById", {
+        orderId: S.orderId!,
+      });
+      expect(
+        isTrpcError(res, 403) || isTrpcError(res, 404),
+        `status=${res.status} — user lain tidak boleh akses order orang lain`,
+      ).toBe(true);
     });
   });
 
@@ -918,6 +986,20 @@ describe.sequential("tRPC API — Functional Blackbox Test", () => {
 
     it("admin.getUsers 200", async () => {
       const res = await S.admin.query("admin.getUsers", { page: 1 });
+      expect(isOk(res.status)).toBe(true);
+    });
+
+    it("order.ship 200 — admin ship order", async () => {
+      expect(S.orderId, "Butuh orderId").not.toBeNull();
+      const res = await S.admin.mutate("order.ship", { orderId: S.orderId! });
+      expect(isOk(res.status)).toBe(true);
+    });
+
+    it("order.deliver 200 — admin deliver order", async () => {
+      expect(S.orderId, "Butuh orderId").not.toBeNull();
+      const res = await S.admin.mutate("order.deliver", {
+        orderId: S.orderId!,
+      });
       expect(isOk(res.status)).toBe(true);
     });
   });

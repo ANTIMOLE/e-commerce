@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useProductDetail } from "@/hooks/useProducts";
-import { formatPrice, formatSoldCount, getImageUrl } from "@/lib/utils";
+import { formatPrice, formatSoldCount } from "@/lib/utils";
 import { PLACEHOLDER_IMAGE, ROUTES } from "@/lib/constants";
 import { useCart } from "@/hooks/useCart";
 
@@ -27,15 +27,22 @@ function ProductDetailImage({
   name: string;
   discount?: number | null;
 }) {
-  const [imgSrc, setImgSrc] = useState(() => getImageUrl(images[0]));
+  // [FIX] Inisialisasi dengan URL mentah — JANGAN lewat getImageUrl() dulu.
+  // getImageUrl() yang lama mengembalikan PLACEHOLDER_IMAGE untuk URL expired,
+  // sehingga onError tidak pernah firing dan images[1] tidak pernah dicoba.
+  // Sekarang biarkan browser yang mencoba fetch dan trigger onError jika gagal.
+  const [imgSrc, setImgSrc] = useState<string>(images[0] || PLACEHOLDER_IMAGE);
 
   const handleError = () => {
     const localPath = images[1]; // e.g. "images/category/slug.jpg"
     if (localPath && imgSrc !== `/${localPath}`) {
+      // Step 2: coba copy lokal di /public/
       setImgSrc(`/${localPath}`);
-    } else {
+    } else if (imgSrc !== PLACEHOLDER_IMAGE) {
+      // Step 3: fallback ke placeholder
       setImgSrc(PLACEHOLDER_IMAGE);
     }
+    // Guard: kalau sudah placeholder, stop — jangan infinite loop
   };
 
   return (
@@ -48,6 +55,9 @@ function ProductDetailImage({
         sizes="(max-width: 768px) 100vw, 384px"
         priority
         onError={handleError}
+        // unoptimized untuk URL eksternal tokopedia agar tidak kena Next.js
+        // image optimization error saat URL expired/berubah format
+        unoptimized={imgSrc.startsWith("http")}
       />
       {discount && discount > 0 ? (
         <span className="absolute top-3 left-3 bg-red-500 text-white text-sm font-bold px-2 py-1 rounded-lg">
@@ -220,10 +230,7 @@ export default function ProductDetailPage({ params }: Props) {
           )}
 
           {/* CTA Buttons */}
-          {/* TODO: sambungkan ke useCart setelah hook siap */}
           <div className="flex gap-3 pt-2">
-
-
             <Button
               disabled={!isAvailable || isAddingItem}
               onClick={() => addItem({ productId: product.id, quantity })}
@@ -232,7 +239,11 @@ export default function ProductDetailPage({ params }: Props) {
             </Button>
             <Button
               className="flex-1 gap-2 bg-gradient-zenit border-0"
-              disabled={!isAvailable}
+              disabled={!isAvailable || isAddingItem}
+              onClick={async () => {
+                await addItem({ productId: product.id, quantity });
+                router.push("/checkout");
+              }}
             >
               <Zap className="w-4 h-4" />
               Beli Sekarang

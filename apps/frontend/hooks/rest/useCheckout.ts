@@ -23,6 +23,39 @@ export function useAddresses() {
   });
 }
 
+
+// ============================================================
+// useCheckoutSummary — [FIX] ambil total dari backend, bukan kalkulasi lokal
+// POST /checkout/calculate-summary
+//
+// Re-fetch otomatis kalau cartId atau shippingMethod berubah via queryKey.
+// Menghilangkan logic drift risk kalau pajak/ongkir/rounding berubah di backend.
+// ============================================================
+export interface CheckoutSummaryResult {
+  subtotal:     number;
+  tax:          number;
+  shippingCost: number;
+  total:        number;
+}
+
+export function useCheckoutSummary(
+  cartId: string | undefined,
+  shippingMethod: ShippingMethodCode
+) {
+  return useQuery<CheckoutSummaryResult>({
+    queryKey: ["checkout", "summary", cartId, shippingMethod],
+    queryFn:  async () => {
+      const res = await api.post<{ success: boolean; data: CheckoutSummaryResult }>(
+        "/checkout/calculate-summary",
+        { cartId, shippingMethod }
+      );
+      return res.data.data;
+    },
+    enabled:   !!cartId,
+    staleTime: 30_000,
+  });
+}
+
 // ============================================================
 // useCheckout — konfirmasi order + buat alamat baru
 // POST /checkout/confirm
